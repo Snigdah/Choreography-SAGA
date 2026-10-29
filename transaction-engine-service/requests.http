@@ -1,0 +1,62 @@
+### =====================================================================
+### Choreography Saga demo  - same API, only the DTO values change
+### Rules (application.yml of each service):
+###   FinBook  fails   if amount > 500,000     (Scenario 1)
+###   Compliance rejects if amount > 500,000   (Scenario 2)
+###   GL       fails   if amount > 1,000,000   (both scenarios)
+### After POST, copy transactionRef and call the GET requests at the bottom.
+### =====================================================================
+
+### Scenario 1 - SUCCESS  -> COMPLETED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "SEQUENTIAL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 1000, "currency": "BDT" }
+
+### Scenario 1 - FinBook FAILS -> GL REVERSED -> FAILED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "SEQUENTIAL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 700000, "currency": "BDT" }
+
+### Scenario 1 - GL FAILS -> nothing to compensate -> FAILED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "SEQUENTIAL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 1500000, "currency": "BDT" }
+
+### Scenario 2 - SUCCESS (GL + Compliance both OK) -> COMPLETED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "PARALLEL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 1000, "currency": "BDT" }
+
+### Scenario 2 - GL OK, Compliance REJECTS -> GL REVERSED + funds RELEASED, FinBook never runs -> FAILED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "PARALLEL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 700000, "currency": "BDT" }
+
+### Scenario 2 - GL FAILS + Compliance REJECTS -> funds RELEASED -> FAILED
+POST http://localhost:8081/api/transactions
+Content-Type: application/json
+
+{ "flowType": "PARALLEL", "debitAccount": "ACC-1001", "creditAccount": "ACC-2001", "amount": 1500000, "currency": "BDT" }
+
+### ---------------- Check the result (replace the ref) ----------------
+@ref = TXN-XXXXXXXXXXXXXX-XXXXXX
+
+### Transaction Engine - final status
+GET http://localhost:8081/api/transactions/{{ref}}
+
+### Account reservation (Scenario 2)
+GET http://localhost:8082/api/accounts/reservations/{{ref}}
+
+### GL journals (POSTING + REVERSAL if compensated)
+GET http://localhost:8083/api/gl/postings/{{ref}}
+
+### Compliance decision (Scenario 2)
+GET http://localhost:8084/api/compliance/checks/{{ref}}
+
+### FinBook entry
+GET http://localhost:8085/api/finbook/entries/{{ref}}

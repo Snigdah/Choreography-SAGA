@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Choreography Saga Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;700&family=Red+Hat+Mono:wght@400;500;600&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+body{margin:0}
+/* Layout: product-docs shell (black utility bar, title block with abstract + quick reference,
+   sticky contents rail, one reading column, wide flow viewers that scroll inside their own frame) */
+:root{
+  --bg:#ffffff; --bg-soft:#f5f5f5; --bg-code:#f2f2f2; --line:#e0e0e0; --line-strong:#c7c7c7;
+  --fg:#151515; --fg-2:#3d3d3d; --fg-3:#6a6e73;
+  --bar:#151515; --bar-fg:#ffffff; --bar-dim:#a3a3a3;
+  --accent:#ee0000; --accent-strong:#a60000; --accent-soft:#fce3e3; --accent-fg:#ffffff;
+  --ink:#151515; --ink-fg:#ffffff;
+  --ok:#3e8635; --ok-bg:#f3faf2;
+  --fail:#c9190b; --fail-bg:#faeae8;
+  --comp:#c46100; --comp-bg:#fdf1e4;
+  --note:#0066cc; --note-bg:#e7f1fa;
+  --imp:#795600; --imp-bg:#fdf7e7;
+  --hl:rgba(238,0,0,.07);
+  --font-display:"Red Hat Display","Segoe UI",system-ui,sans-serif;
+  --font-body:"Red Hat Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-mono:"Red Hat Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#151515; --bg-soft:#1d1d1d; --bg-code:#1b1b1b; --line:#333333; --line-strong:#4d4d4d;
+  --fg:#f0f0f0; --fg-2:#c7c7c7; --fg-3:#a3a3a3;
+  --bar:#000000; --bar-fg:#ffffff; --bar-dim:#a3a3a3;
+  --accent:#f56e6e; --accent-strong:#f9a8a8; --accent-soft:#3a1515; --accent-fg:#151515;
+  --ink:#f0f0f0; --ink-fg:#151515;
+  --ok:#87bb62; --ok-bg:#1f2a19;
+  --fail:#f0817a; --fail-bg:#3a1a17;
+  --comp:#f4b678; --comp-bg:#3a2814;
+  --note:#73bcf7; --note-bg:#142433;
+  --imp:#f4c145; --imp-bg:#33290f;
+  --hl:rgba(245,110,110,.10);
+  color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#151515; --bg-soft:#1d1d1d; --bg-code:#1b1b1b; --line:#333333; --line-strong:#4d4d4d;
+  --fg:#f0f0f0; --fg-2:#c7c7c7; --fg-3:#a3a3a3;
+  --bar:#000000; --bar-fg:#ffffff; --bar-dim:#a3a3a3;
+  --accent:#f56e6e; --accent-strong:#f9a8a8; --accent-soft:#3a1515; --accent-fg:#151515;
+  --ink:#f0f0f0; --ink-fg:#151515;
+  --ok:#87bb62; --ok-bg:#1f2a19;
+  --fail:#f0817a; --fail-bg:#3a1a17;
+  --comp:#f4b678; --comp-bg:#3a2814;
+  --note:#73bcf7; --note-bg:#142433;
+  --imp:#f4c145; --imp-bg:#33290f;
+  --hl:rgba(245,110,110,.10);
+  color-scheme:dark; }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--note);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,tr[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+code,pre{font-family:var(--font-mono)}
+.gutter{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:1320px;margin:0 auto}
+
+/* utility bar */
+.bar{background:var(--bar);color:var(--bar-fg);font-size:14px;border-top:4px solid var(--accent)}
+.bar-in{padding-block:11px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.org{display:flex;align-items:center;gap:10px;font-weight:600;font-family:var(--font-display);letter-spacing:.01em}
+.org-mark{width:26px;height:26px;border-radius:4px;background:#ee0000;color:#ffffff;display:grid;place-items:center;font-weight:700;font-size:12.5px}
+.bar-sep{width:1px;height:18px;background:var(--bar-dim);opacity:.4}
+.bar-dim{color:var(--bar-dim)}
+.bar-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-size:12px;border:1px solid rgba(163,163,163,.35);color:var(--bar-dim);border-radius:3px;padding:2px 8px;white-space:nowrap}
+.pill b{color:var(--bar-fg);font-weight:500}
+
+/* title block */
+.titleblock{border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-soft),var(--bg))}
+.titleblock-in{padding-block:22px 26px}
+.crumbs{font-size:13.5px;color:var(--fg-3);display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:24px}
+.crumbs .sl{opacity:.6}
+.crumbs .cur{color:var(--fg-2);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:44px;align-items:start}
+.hero-main{min-width:0}
+.prodline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.product{font-size:15px;font-weight:600;color:var(--accent);font-family:var(--font-display)}
+.tag{font-size:11.5px;font-weight:600;letter-spacing:.04em;border-radius:3px;padding:2px 8px;border:1px solid}
+.tag-ver{color:var(--fg-2);border-color:var(--line-strong);background:var(--bg);font-family:var(--font-mono)}
+.tag-poc{color:var(--imp);border-color:var(--imp);background:var(--imp-bg)}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance}
+.titleblock h1{font-size:clamp(32px,4.4vw,46px);line-height:1.1;font-weight:600;margin:0 0 8px;letter-spacing:-.01em}
+.subtitle{font-size:18px;color:var(--fg-2);margin:0 0 22px}
+.abstract{max-width:70ch;border-left:3px solid var(--accent);background:var(--bg);padding:12px 16px;border-radius:0 4px 4px 0}
+.abstract .lbl{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:600}
+.abstract p{margin:4px 0 0;color:var(--fg-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.chip{font-size:12.5px;border:1px solid var(--line-strong);border-radius:999px;padding:2px 10px;color:var(--fg-2);background:var(--bg)}
+.byline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:20px;font-size:14px;color:var(--fg-2)}
+.by-lbl{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:600}
+.av{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--ink-fg);display:inline-grid;place-items:center;font-size:11px;font-weight:600;margin-right:6px;vertical-align:middle}
+
+.qs{border:1px solid var(--line);border-radius:6px;background:var(--bg);overflow:hidden;min-width:0}
+.qs-head{background:var(--ink);color:var(--ink-fg);padding:10px 14px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.qs-title{font-family:var(--font-display);font-weight:600}
+.qs-sub{font-size:12.5px;opacity:.75}
+.qs table{width:100%;border-collapse:collapse;font-size:13.5px}
+.qs th,.qs td{padding:7px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.qs th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);font-weight:600;background:var(--bg-soft)}
+.qs td code{font-size:12.5px}
+.qs tr:last-child td{border-bottom:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* shell */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);gap:48px;padding-block:32px 60px}
+.rail{position:sticky;top:max(16px, env(safe-area-inset-top, 0px));align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px}
+.rail summary{font-family:var(--font-display);font-weight:600;cursor:pointer;padding:4px 0 10px;list-style:none}
+.rail summary::-webkit-details-marker{display:none}
+.rail ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}
+.rail li a{display:block;padding:5px 0 5px 14px;color:var(--fg-2);text-decoration:none;border-left:3px solid transparent;margin-left:-2px;line-height:1.4}
+.rail li a:hover{color:var(--fg)}
+.rail li a.on{color:var(--fg);font-weight:600;border-left-color:var(--accent)}
+.rail li.sub a{padding-left:28px;font-size:13.5px}
+main{min-width:0}
+.prose{max-width:76ch}
+section.doc{padding-top:8px;margin-bottom:56px}
+section.doc > h2{font-size:28px;font-weight:600;margin:0 0 6px;padding-top:10px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:baseline}
+.chap{font-family:var(--font-mono);font-size:14px;color:var(--accent);font-weight:600}
+h3{font-size:20px;font-weight:600;margin:34px 0 8px}
+h4{font-size:16px;font-weight:600;margin:22px 0 6px}
+.lede{color:var(--fg-2);font-size:17px;margin-top:4px}
+p code,li code,td code{background:var(--bg-code);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:.88em}
+p code,li code{overflow-wrap:anywhere}
+td code{white-space:nowrap}
+
+/* admonitions */
+.adm{border-left:4px solid;border-radius:0 4px 4px 0;padding:12px 16px;margin:18px 0;max-width:76ch}
+.adm .h{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:2px}
+.adm p{margin:4px 0 0}
+.adm.note{border-color:var(--note);background:var(--note-bg)} .adm.note .h{color:var(--note)}
+.adm.imp{border-color:var(--imp);background:var(--imp-bg)} .adm.imp .h{color:var(--imp)}
+.adm.warn{border-color:var(--fail);background:var(--fail-bg)} .adm.warn .h{color:var(--fail)}
+.adm.tip{border-color:var(--ok);background:var(--ok-bg)} .adm.tip .h{color:var(--ok)}
+
+/* tables */
+.tbl{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--line);border-radius:4px}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+.tbl th,.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--bg-soft);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-3);font-weight:600;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.m{font-family:var(--font-mono);font-size:13px}
+.k{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.03em;border-radius:3px;padding:1px 7px;border:1px solid;white-space:nowrap}
+.k-fwd{color:var(--fg-2);border-color:var(--line-strong);background:var(--bg)}
+.k-ok{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.k-fail{color:var(--fail);border-color:var(--fail);background:var(--fail-bg)}
+.k-comp{color:var(--comp);border-color:var(--comp);background:var(--comp-bg)}
+.k-http{color:var(--note);border-color:var(--note);background:var(--note-bg)}
+
+/* code */
+.code{border:1px solid var(--line);border-radius:4px;margin:12px 0 18px;background:var(--bg-code);overflow:hidden;max-width:100%}
+.code-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px 6px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--fg-3);background:var(--bg-soft)}
+.code pre{margin:0;padding:12px 14px;overflow-x:auto;font-size:13.5px;line-height:1.6;color:var(--fg)}
+.copy{font:inherit;font-size:12px;border:1px solid var(--line-strong);background:var(--bg);color:var(--fg-2);border-radius:3px;padding:2px 10px;cursor:pointer}
+.copy:hover{border-color:var(--fg-3);color:var(--fg)}
+
+/* flow chain (overview chips) */
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 4px}
+.chain .n{font-family:var(--font-display);font-weight:600;font-size:14px;background:var(--ink);color:var(--ink-fg);border-radius:3px;padding:5px 12px}
+.chain .a{color:var(--fg-3);font-family:var(--font-mono)}
+.chain .par{display:inline-flex;flex-direction:column;gap:4px;border:1px dashed var(--line-strong);border-radius:4px;padding:6px}
+.chain .par .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:600;text-align:center}
+
+/* endpoint card */
+.ep{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border:1px solid var(--line);border-radius:4px;padding:10px 14px;background:var(--bg-soft);margin:14px 0}
+.verb{font-family:var(--font-mono);font-weight:600;font-size:13px;background:var(--ok);color:var(--bg);border-radius:3px;padding:2px 8px}
+.ep .path{font-family:var(--font-mono);font-size:15px;font-weight:500}
+.ep .ret{margin-left:auto;font-size:13px;color:var(--fg-3)}
+
+/* case tabs + flow viewer */
+.cases{margin:20px 0 8px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+.tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--bg-soft)}
+.tab{font:inherit;font-size:14px;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;padding:11px 16px 9px;color:var(--fg-2);cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);background:var(--bg);font-weight:600}
+.tab .dot{width:8px;height:8px;border-radius:50%}
+.dot.ok{background:var(--ok)} .dot.fail{background:var(--fail)}
+.panel{padding:16px}
+.case-intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start;margin-bottom:12px}
+.case-intro p{margin:0;color:var(--fg-2);max-width:72ch}
+.result{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--fg-3);white-space:nowrap}
+.result .s{font-family:var(--font-mono);font-weight:600;font-size:14px;padding:3px 10px;border-radius:3px;border:1px solid}
+.result .s.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.result .s.fail{color:var(--fail);border-color:var(--fail);background:var(--fail-bg)}
+.ctrls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 10px}
+.btn{font:inherit;font-size:13.5px;font-weight:500;border:1px solid var(--line-strong);background:var(--bg);color:var(--fg);border-radius:3px;padding:5px 12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.btn:hover{border-color:var(--fg-3)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.pri:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+.btn:disabled{opacity:.45;cursor:default}
+.counter{font-size:13px;color:var(--fg-3);margin-left:6px;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--fg-2);margin-left:auto}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid}
+.legend i.fwd{border-color:var(--fg)} .legend i.fail{border-color:var(--fail)} .legend i.comp{border-color:var(--comp);border-top-style:dashed}
+.legend b{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--line-strong);background:var(--bg-soft)}
+.stage{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--bg)}
+.stage svg{display:block}
+.caption{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--line);border-top:0;border-radius:0 0 4px 4px;padding:10px 14px;background:var(--bg-soft);min-height:56px;margin-top:-1px}
+.caption .no{font-family:var(--font-mono);font-weight:600;font-size:13px;background:var(--ink);color:var(--ink-fg);border-radius:3px;padding:2px 8px;white-space:nowrap}
+.caption .txt{font-size:14.5px;color:var(--fg)}
+.caption .txt small{display:block;color:var(--fg-3);font-size:12.5px}
+.steps{margin-top:14px}
+.steps tr{cursor:pointer}
+.steps tr:hover td{background:var(--bg-soft)}
+.steps tr.cur td{background:var(--hl)}
+.steps td.n{font-family:var(--font-mono);font-weight:600;color:var(--fg-3);width:40px}
+
+/* svg diagram classes */
+.d-head rect{fill:var(--ink)} .d-head text{fill:var(--ink-fg)}
+.d-head.client rect{fill:var(--bg);stroke:var(--fg-3);stroke-dasharray:4 3} .d-head.client text{fill:var(--fg)}
+.d-life{stroke:var(--line-strong);stroke-dasharray:3 4}
+.d-t1{font-family:var(--font-display);font-weight:600;font-size:13px}
+.d-t2{font-family:var(--font-mono);font-size:10.5px;opacity:.8}
+.d-ev{font-family:var(--font-mono);font-weight:600;font-size:12px;fill:var(--fg)}
+.d-topic{font-family:var(--font-mono);font-size:11px;fill:var(--fg-3)}
+.d-line{stroke-width:1.8;fill:none}
+.d-line.fwd{stroke:var(--fg)} .d-line.http{stroke:var(--note)} .d-line.reply{stroke:var(--note);stroke-dasharray:5 4}
+.d-line.fail{stroke:var(--fail)} .d-line.comp{stroke:var(--comp);stroke-dasharray:6 4}
+.mk-fwd{fill:var(--fg)} .mk-http{fill:var(--note)} .mk-fail{fill:var(--fail)} .mk-comp{fill:var(--comp)}
+.d-ev.fail{fill:var(--fail)} .d-ev.comp{fill:var(--comp)} .d-ev.http{fill:var(--note)}
+.d-chip rect{stroke-width:1.2}
+.d-chip text{font-family:var(--font-body);font-size:12.5px;font-weight:500}
+.d-chip.neutral rect{fill:var(--bg-soft);stroke:var(--line-strong)} .d-chip.neutral text{fill:var(--fg)}
+.d-chip.ok rect{fill:var(--ok-bg);stroke:var(--ok)} .d-chip.ok text{fill:var(--ok)}
+.d-chip.fail rect{fill:var(--fail-bg);stroke:var(--fail)} .d-chip.fail text{fill:var(--fail)}
+.d-chip.comp rect{fill:var(--comp-bg);stroke:var(--comp)} .d-chip.comp text{fill:var(--comp)}
+.d-chip.skip rect{fill:var(--bg);stroke:var(--line-strong);stroke-dasharray:3 3} .d-chip.skip text{fill:var(--fg-3);font-style:italic}
+.d-badge circle{fill:var(--bg);stroke:var(--fg-3)} .d-badge text{fill:var(--fg-2);font-family:var(--font-mono);font-size:11px;font-weight:600}
+.d-reg.par{fill:none;stroke:var(--fg-3);stroke-dasharray:5 4}
+.d-reg.comp{fill:var(--comp-bg);stroke:var(--comp);stroke-opacity:.5}
+.d-reg-lbl{font-family:var(--font-display);font-weight:700;font-size:11px;letter-spacing:.08em}
+.d-reg-lbl.par{fill:var(--fg-3)} .d-reg-lbl.comp{fill:var(--comp)}
+.d-hl{fill:transparent}
+.st{transition:opacity .25s}
+@media (prefers-reduced-motion: reduce){.st{transition:none}}
+svg.stepping .st.future{opacity:.1}
+svg.stepping .st.cur .d-hl{fill:var(--hl)}
+svg.stepping .st.cur .d-badge circle{fill:var(--accent);stroke:var(--accent)}
+svg.stepping .st.cur .d-badge text{fill:var(--accent-fg)}
+svg.stepping .st.cur .d-line{stroke-width:2.6}
+
+/* animated topology view */
+.views{display:inline-flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden;margin-right:6px}
+.views button{font:inherit;font-size:13px;font-weight:500;border:0;background:var(--bg);color:var(--fg-2);padding:5px 12px;cursor:pointer}
+.views button + button{border-left:1px solid var(--line-strong)}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--ink-fg)}
+.topo{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--bg-soft)}
+.topo svg{display:block;margin:0 auto}
+.t-box rect.b{fill:var(--ink);stroke:var(--ink);stroke-width:1}
+.t-box text.n{fill:var(--ink-fg);font-family:var(--font-display);font-weight:600;font-size:13.5px}
+.t-box text.p{fill:var(--ink-fg);font-family:var(--font-mono);font-size:10.5px;opacity:.78}
+.t-box.client rect.b{fill:var(--bg);stroke:var(--fg-3);stroke-dasharray:4 3}
+.t-box.client text.n,.t-box.client text.p{fill:var(--fg)}
+.t-box rect.ring{fill:none;stroke:var(--accent);stroke-width:3;opacity:0}
+.t-box.active rect.ring{opacity:1}
+.t-box.hit rect.ring{opacity:1;stroke-width:2;stroke-dasharray:5 3;animation:tpulse .7s ease-out}
+.t-box.hit.k-fwd rect.ring{stroke:var(--fg-3)} .t-box.hit.k-http rect.ring{stroke:var(--note)} .t-box.hit.k-fail rect.ring{stroke:var(--fail)} .t-box.hit.k-comp rect.ring{stroke:var(--comp)}
+@keyframes tpulse{0%{stroke-width:10;opacity:.2}100%{stroke-width:2;opacity:1}}
+.t-chip rect{stroke-width:1.2}
+.t-chip .tb{font-family:var(--font-mono);font-size:10px}
+.t-chip .v{font-family:var(--font-body);font-size:12px;font-weight:600}
+.t-chip.idle rect{fill:var(--bg);stroke:var(--line-strong);stroke-dasharray:3 3} .t-chip.idle text{fill:var(--fg-3)}
+.t-chip.neutral rect{fill:var(--bg);stroke:var(--line-strong)} .t-chip.neutral text{fill:var(--fg)}
+.t-chip.ok rect{fill:var(--ok-bg);stroke:var(--ok)} .t-chip.ok text{fill:var(--ok)}
+.t-chip.fail rect{fill:var(--fail-bg);stroke:var(--fail)} .t-chip.fail text{fill:var(--fail)}
+.t-chip.comp rect{fill:var(--comp-bg);stroke:var(--comp)} .t-chip.comp text{fill:var(--comp)}
+.t-chip.skip rect{fill:var(--bg);stroke:var(--line-strong);stroke-dasharray:3 3} .t-chip.skip text{fill:var(--fg-3)}
+.t-edge{fill:none;stroke:var(--line-strong);stroke-width:1.3;stroke-dasharray:3 5}
+.t-edge.used{stroke-dasharray:none;stroke-width:1.8}
+.t-edge.used.fwd{stroke:var(--fg-3)} .t-edge.used.http{stroke:var(--note)}
+.t-edge.used.fail{stroke:var(--fail)} .t-edge.used.comp{stroke:var(--comp);stroke-dasharray:7 4}
+.t-edge.cur{stroke-width:3.2}
+.t-edge.cur.fwd{stroke:var(--fg)}
+.tm-track{fill:var(--line-strong)} .tm-fwd{fill:var(--fg-3)} .tm-cur{fill:var(--fg)} .tm-http{fill:var(--note)} .tm-fail{fill:var(--fail)} .tm-comp{fill:var(--comp)}
+.t-label rect{fill:var(--bg);stroke-width:1.5}
+.t-label .ev{font-family:var(--font-mono);font-weight:600;font-size:12px}
+.t-label .tp{font-family:var(--font-mono);font-size:10.5px;fill:var(--fg-3)}
+.t-label.fwd rect{stroke:var(--fg)} .t-label.fwd .ev{fill:var(--fg)}
+.t-label.http rect{stroke:var(--note)} .t-label.http .ev{fill:var(--note)}
+.t-label.fail rect{stroke:var(--fail)} .t-label.fail .ev{fill:var(--fail)}
+.t-label.comp rect{stroke:var(--comp)} .t-label.comp .ev{fill:var(--comp)}
+.t-pk{stroke:var(--bg);stroke-width:2}
+.t-pk.fwd{fill:var(--fg)} .t-pk.http{fill:var(--note)} .t-pk.fail{fill:var(--fail)} .t-pk.comp{fill:var(--comp)}
+.tnote{margin:0;padding:8px 14px;font-size:12.5px;color:var(--fg-3);border-top:1px solid var(--line);background:var(--bg)}
+.t-hint{font-family:var(--font-body);font-size:12px;fill:var(--fg-3)}
+@media (prefers-reduced-motion: reduce){.t-box.hit rect.ring{animation:none}}
+
+/* per-step Kafka message */
+.msg{border:1px solid var(--line);border-top:0;border-radius:0 0 4px 4px;background:var(--bg-code);margin-top:-1px}
+.msg-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--fg-3);background:var(--bg-soft)}
+.msg-head b{color:var(--fg);font-weight:600;font-family:var(--font-display);font-size:13px}
+.msg-head code{background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:0 5px;font-size:12px;color:var(--fg)}
+.msg pre{margin:0;padding:12px 14px;max-height:360px;overflow:auto;font-size:12.5px;line-height:1.55;color:var(--fg)}
+.msg pre .jk{color:var(--note)} .msg pre .js{color:var(--ok)} .msg pre .jn{color:var(--comp)} .msg pre .jb{color:var(--fg-3);font-style:italic}
+.msg pre .jt{color:var(--accent);font-weight:600}
+.msg .none{padding:10px 14px;font-size:13px;color:var(--fg-3)}
+.caption.has-msg{border-radius:0}
+
+/* architecture */
+.arch{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--bg);margin:16px 0 8px}
+.a-svc rect{fill:var(--ink)} .a-svc .t1{fill:var(--ink-fg);font-family:var(--font-display);font-weight:600;font-size:14px} .a-svc .t2{fill:var(--ink-fg);font-family:var(--font-mono);font-size:12px;opacity:.8}
+.a-kafka{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.a-kt{fill:var(--fg);font-family:var(--font-display);font-weight:700;font-size:15px}
+.a-ks{fill:var(--fg-2);font-family:var(--font-mono);font-size:12px}
+.a-topic rect{fill:var(--bg);stroke:var(--accent);stroke-width:1} .a-topic text{fill:var(--fg);font-family:var(--font-mono);font-size:12px}
+.a-db path,.a-db ellipse{fill:var(--bg-soft);stroke:var(--fg-3);stroke-width:1.2}
+.a-db .t1{fill:var(--fg);font-family:var(--font-mono);font-weight:600;font-size:12.5px}
+.a-ext rect{fill:var(--bg);stroke:var(--fg-3);stroke-dasharray:4 3} .a-ext text{fill:var(--fg);font-family:var(--font-body);font-size:12.5px}
+.a-ext .t1{font-weight:600}
+.a-line{stroke:var(--fg-3);stroke-width:1.5;fill:none}
+.a-line.ev{stroke:var(--accent)}
+.a-mk{fill:var(--fg-3)} .a-mk.ev{fill:var(--accent)}
+.a-lbl{fill:var(--fg-3);font-family:var(--font-body);font-size:12px}
+.a-band{fill:none;stroke:var(--line-strong);stroke-dasharray:4 4}
+
+footer.legal{border-top:1px solid var(--line);padding-block:22px 40px;color:var(--fg-3);font-size:13px}
+footer.legal p{max-width:90ch;margin:4px 0}
+
+@media (max-width: 1000px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:24px}
+  .shell{grid-template-columns:minmax(0,1fr);gap:20px}
+  .rail{position:static;max-height:none;border:1px solid var(--line);border-radius:4px;padding:10px 14px}
+  .legend{margin-left:0}
+}
+@media (max-width: 560px){
+  .case-intro{grid-template-columns:minmax(0,1fr)}
+  .result{align-items:flex-start}
+  .ep .ret{margin-left:0}
+}
+</style>
+
+</head>
+<body>
+<header class="bar"><div class="wrap bar-in gutter">
+  <div class="org"><span class="org-mark" aria-hidden="true">L</span>Leads Corporation Limited</div>
+  <span class="bar-sep" aria-hidden="true"></span>
+  <span class="bar-dim">Product Documentation</span>
+  <div class="bar-right">
+    <span class="pill">Version <b>1.1 POC</b></span>
+    <span class="pill">Format <b>Single-page HTML</b></span>
+  </div>
+</div></header>
+
+<div class="titleblock"><div class="wrap titleblock-in gutter">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <span>Documentation</span><span class="sl">/</span>
+    <span>Microservice Patterns</span><span class="sl">/</span>
+    <span>Choreography Saga</span><span class="sl">/</span>
+    <span class="cur">Event Flow Guide</span>
+  </nav>
+  <div class="hero">
+    <div class="hero-main">
+      <div class="prodline"><span class="product">Choreography Saga POC</span><span class="tag tag-ver">1.1</span><span class="tag tag-poc">Proof of concept</span><span class="tag tag-ver">Updated 28 Oct 2026</span></div>
+      <h1>Choreography Saga with Kafka</h1>
+      <p class="subtitle">How a fund transfer moves through five Spring Boot services, and how each failure is rolled back</p>
+      <div class="abstract">
+        <div class="lbl">Abstract</div>
+        <p>This guide explains the financial-transfer Saga POC for developers who are new to the pattern. It lists every service, port, database and Kafka topic, describes the event envelope and body format, then walks through both scenarios event by event: the success path, and each failure path with its compensating (rollback) events. Every flow diagram can be played step by step.</p>
+      </div>
+      <div class="chips" aria-label="Technology">
+        <span class="chip">Java 21</span><span class="chip">Spring Boot 3.5.6</span><span class="chip">Spring Kafka</span><span class="chip">Apache Kafka 4.1 (KRaft)</span><span class="chip">PostgreSQL</span><span class="chip">Maven</span>
+      </div>
+      <div class="byline"><span class="by-lbl">Developed by</span><span><span class="av" aria-hidden="true">KS</span>K M Farhat Snigdah</span></div>
+    </div>
+    <aside class="qs" aria-label="Quick reference">
+      <div class="qs-head"><span class="qs-title">Quick reference</span><span class="qs-sub">Ports and databases</span></div>
+      <table>
+        <thead><tr><th>Component</th><th>Port</th><th>Database</th></tr></thead>
+        <tbody>
+          <tr><td>Transaction Engine</td><td class="num"><code>8081</code></td><td><code>txn_db</code></td></tr>
+          <tr><td>Account Service</td><td class="num"><code>8082</code></td><td><code>account_db</code></td></tr>
+          <tr><td>GL Service</td><td class="num"><code>8083</code></td><td><code>gl_db</code></td></tr>
+          <tr><td>Compliance Service</td><td class="num"><code>8084</code></td><td><code>compliance_db</code></td></tr>
+          <tr><td>FinBook Service</td><td class="num"><code>8085</code></td><td><code>finbook_db</code></td></tr>
+          <tr><td>Kafka broker</td><td class="num"><code>9092</code></td><td>–</td></tr>
+          <tr><td>Kafka UI</td><td class="num"><code>8090</code></td><td>–</td></tr>
+          <tr><td>PostgreSQL</td><td class="num"><code>5432</code></td><td>5 databases</td></tr>
+        </tbody>
+      </table>
+    </aside>
+  </div>
+</div></div>
+
+<div class="wrap shell gutter">
+<aside class="rail" aria-label="Table of contents">
+  <details id="toc" open>
+    <summary>Table of contents</summary>
+    <ol>
+      <li><a href="#concepts">1. Saga basics</a></li>
+      <li><a href="#landscape">2. System landscape</a></li>
+      <li class="sub"><a href="#services">Services</a></li>
+      <li class="sub"><a href="#infra">Infrastructure</a></li>
+      <li><a href="#events">3. Topics and events</a></li>
+      <li class="sub"><a href="#message">Envelope and body</a></li>
+      <li class="sub"><a href="#bodies">Body per event type</a></li>
+      <li class="sub"><a href="#catalog">Event catalog</a></li>
+      <li><a href="#api">4. The transfer API</a></li>
+      <li><a href="#s1">5. Scenario 1: Sequential</a></li>
+      <li><a href="#s2">6. Scenario 2: Parallel</a></li>
+      <li><a href="#rollback">7. Rollback reference</a></li>
+      <li><a href="#status">8. Status values</a></li>
+      <li><a href="#run">9. Run and verify</a></li>
+      <li><a href="#trouble">10. Troubleshooting</a></li>
+      <li><a href="#history">11. Revision history</a></li>
+    </ol>
+  </details>
+</aside>
+
+<main>
+
+<!-- ============ 1 ============ -->
+<section class="doc" id="concepts">
+  <h2><span class="chap">01</span>Saga basics</h2>
+  <div class="prose">
+    <p class="lede">A fund transfer touches several services, and each one has its own database. A single database transaction cannot cover all of them, so the work is split into local steps that are linked by events.</p>
+    <p>A <strong>Saga</strong> is that chain of local steps. Each service commits its own change, then publishes an event saying what happened. The next service reacts to that event.</p>
+    <p>In a <strong>choreography</strong> Saga there is no central coordinator. No service calls another service. Each service only listens to Kafka topics and decides for itself what to do next.</p>
+    <p>If a step fails, earlier steps cannot be rolled back with a database rollback, because they are already committed in other databases. Instead, the failing service publishes a <em>failure event</em>, and the services that already did work run a <strong>compensating action</strong>: a new business transaction that undoes the effect. For example, GL never deletes a journal. It books a new reversal journal with debit and credit swapped.</p>
+  </div>
+  <h3>Five rules this POC follows</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Rule</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Services talk only through Kafka events.</td><td>No service knows the URL of another. A slow or stopped service does not block the others.</td></tr>
+      <tr><td>2</td><td>Each service owns its own database.</td><td>Transaction Engine cannot read or update <code>gl_journal</code>. It learns about GL only from GL events.</td></tr>
+      <tr><td>3</td><td><code>flowType</code> travels in every event.</td><td>Both scenarios start with the same event. <code>SEQUENTIAL</code> or <code>PARALLEL</code> tells each service whether to react.</td></tr>
+      <tr><td>4</td><td>Rollback is a new action, never a delete.</td><td>GL posts a <code>REVERSAL</code> journal. Account sets the reservation to <code>RELEASED</code>. The audit trail stays complete.</td></tr>
+      <tr><td>5</td><td>The <code>transactionRef</code> is the Kafka message key.</td><td>All events for one transfer land on the same partition, so they are processed in order.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="doc" id="landscape">
+  <h2><span class="chap">02</span>System landscape</h2>
+  <p class="lede prose">Five independent Spring Boot applications, one Kafka broker and one PostgreSQL server. Each service has its own database on that server.</p>
+
+  <div class="arch" role="img" aria-label="Architecture: client calls Transaction Engine; all five services exchange events through Kafka; each service has its own PostgreSQL database">
+  <svg viewBox="0 0 1060 500" width="1060" height="500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="a-mk" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="amr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="a-mk ev" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+    <!-- Kafka -->
+    <rect class="a-kafka" x="180" y="24" width="860" height="112" rx="6"/>
+    <text class="a-kt" x="200" y="52">Apache Kafka 4.1 · KRaft mode</text>
+    <text class="a-ks" x="200" y="72">localhost:9092 · 5 topics · 3 partitions each · created by the services at startup</text>
+    <g class="a-topic"><rect x="200" y="90" width="150" height="28" rx="3"/><text x="275" y="109" text-anchor="middle">transaction-events</text></g>
+    <g class="a-topic"><rect x="368" y="90" width="150" height="28" rx="3"/><text x="443" y="109" text-anchor="middle">account-events</text></g>
+    <g class="a-topic"><rect x="536" y="90" width="150" height="28" rx="3"/><text x="611" y="109" text-anchor="middle">gl-events</text></g>
+    <g class="a-topic"><rect x="704" y="90" width="150" height="28" rx="3"/><text x="779" y="109" text-anchor="middle">compliance-events</text></g>
+    <g class="a-topic"><rect x="872" y="90" width="150" height="28" rx="3"/><text x="947" y="109" text-anchor="middle">finbook-events</text></g>
+    <!-- Kafka UI -->
+    <g class="a-ext"><rect x="20" y="44" width="130" height="58" rx="4"/><text class="t1" x="85" y="68" text-anchor="middle">Kafka UI</text><text x="85" y="88" text-anchor="middle">localhost:8090</text></g>
+    <path class="a-line" d="M150 73 H178" marker-end="url(#am)"/>
+    <!-- services -->
+    <g class="a-svc"><rect x="180" y="214" width="156" height="70" rx="4"/><text class="t1" x="258" y="243" text-anchor="middle">Transaction Engine</text><text class="t2" x="258" y="265" text-anchor="middle">port 8081</text></g>
+    <g class="a-svc"><rect x="356" y="214" width="156" height="70" rx="4"/><text class="t1" x="434" y="243" text-anchor="middle">Account Service</text><text class="t2" x="434" y="265" text-anchor="middle">port 8082</text></g>
+    <g class="a-svc"><rect x="532" y="214" width="156" height="70" rx="4"/><text class="t1" x="610" y="243" text-anchor="middle">GL Service</text><text class="t2" x="610" y="265" text-anchor="middle">port 8083</text></g>
+    <g class="a-svc"><rect x="708" y="214" width="156" height="70" rx="4"/><text class="t1" x="786" y="243" text-anchor="middle">Compliance Service</text><text class="t2" x="786" y="265" text-anchor="middle">port 8084</text></g>
+    <g class="a-svc"><rect x="884" y="214" width="156" height="70" rx="4"/><text class="t1" x="962" y="243" text-anchor="middle">FinBook Service</text><text class="t2" x="962" y="265" text-anchor="middle">port 8085</text></g>
+    <!-- service <-> kafka -->
+    <path class="a-line ev" d="M258 212 V138" marker-start="url(#amr)" marker-end="url(#amr)"/>
+    <path class="a-line ev" d="M434 212 V138" marker-start="url(#amr)" marker-end="url(#amr)"/>
+    <path class="a-line ev" d="M610 212 V138" marker-start="url(#amr)" marker-end="url(#amr)"/>
+    <path class="a-line ev" d="M786 212 V138" marker-start="url(#amr)" marker-end="url(#amr)"/>
+    <path class="a-line ev" d="M962 212 V138" marker-start="url(#amr)" marker-end="url(#amr)"/>
+    <text class="a-lbl" x="266" y="180">publish / consume</text>
+    <!-- client -->
+    <g class="a-ext"><rect x="20" y="220" width="130" height="58" rx="4"/><text class="t1" x="85" y="244" text-anchor="middle">Client</text><text x="85" y="264" text-anchor="middle">curl / Postman</text></g>
+    <path class="a-line" d="M150 249 H178" marker-end="url(#am)"/>
+    <text class="a-lbl" x="85" y="300" text-anchor="middle">POST /api/transactions</text>
+    <!-- dbs -->
+    <path class="a-line" d="M258 284 V352"/><path class="a-line" d="M434 284 V352"/><path class="a-line" d="M610 284 V352"/><path class="a-line" d="M786 284 V352"/><path class="a-line" d="M962 284 V352"/>
+    <g class="a-db"><path d="M208 362 v52 a50 11 0 0 0 100 0 v-52"/><ellipse cx="258" cy="362" rx="50" ry="11"/><text class="t1" x="258" y="400" text-anchor="middle">txn_db</text></g>
+    <g class="a-db"><path d="M379 362 v52 a55 11 0 0 0 110 0 v-52"/><ellipse cx="434" cy="362" rx="55" ry="11"/><text class="t1" x="434" y="400" text-anchor="middle">account_db</text></g>
+    <g class="a-db"><path d="M560 362 v52 a50 11 0 0 0 100 0 v-52"/><ellipse cx="610" cy="362" rx="50" ry="11"/><text class="t1" x="610" y="400" text-anchor="middle">gl_db</text></g>
+    <g class="a-db"><path d="M726 362 v52 a60 11 0 0 0 120 0 v-52"/><ellipse cx="786" cy="362" rx="60" ry="11"/><text class="t1" x="786" y="400" text-anchor="middle">compliance_db</text></g>
+    <g class="a-db"><path d="M907 362 v52 a55 11 0 0 0 110 0 v-52"/><ellipse cx="962" cy="362" rx="55" ry="11"/><text class="t1" x="962" y="400" text-anchor="middle">finbook_db</text></g>
+    <rect class="a-band" x="180" y="340" width="860" height="108" rx="6"/>
+    <text class="a-lbl" x="610" y="472" text-anchor="middle">PostgreSQL · localhost:5432 · one database per service · tables created by JPA on first start</text>
+  </svg>
+  </div>
+  <p class="prose" style="font-size:14px;color:var(--fg-3)">Red arrows carry Kafka events. Grey lines are JDBC connections to each service's own database. No service calls another service over HTTP.</p>
+
+  <h3 id="services">Services</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Service</th><th>Project folder</th><th>Port</th><th>Database</th><th>Tables</th><th>Publishes to</th><th>Listens to</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Transaction Engine</strong><br><small>Starts the Saga and records the final status</small></td><td class="m">transaction-engine-service</td><td class="m">8081</td><td class="m">txn_db</td><td class="m">bank_transaction</td><td class="m">transaction-events</td><td class="m">account-events<br>gl-events<br>compliance-events<br>finbook-events</td></tr>
+      <tr><td><strong>Account Service</strong><br><small>Reserves and releases funds (Scenario 2)</small></td><td class="m">account-service</td><td class="m">8082</td><td class="m">account_db</td><td class="m">account_reservation</td><td class="m">account-events</td><td class="m">transaction-events<br>gl-events<br>compliance-events<br>finbook-events</td></tr>
+      <tr><td><strong>GL Service</strong><br><small>Posts and reverses journals</small></td><td class="m">gl-service</td><td class="m">8083</td><td class="m">gl_db</td><td class="m">gl_journal<br>gl_journal_entry</td><td class="m">gl-events</td><td class="m">transaction-events<br>account-events<br>compliance-events<br>finbook-events</td></tr>
+      <tr><td><strong>Compliance Service</strong><br><small>Approves or rejects (Scenario 2)</small></td><td class="m">compliance-service</td><td class="m">8084</td><td class="m">compliance_db</td><td class="m">compliance_check</td><td class="m">compliance-events</td><td class="m">account-events</td></tr>
+      <tr><td><strong>FinBook Service</strong><br><small>Records the financial-book entry</small></td><td class="m">finbook-service</td><td class="m">8085</td><td class="m">finbook_db</td><td class="m">finbook_entry<br>finbook_join</td><td class="m">finbook-events</td><td class="m">gl-events<br>compliance-events</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="infra">Infrastructure</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Component</th><th>Address</th><th>Runs as</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Kafka broker</td><td class="m">localhost:9092</td><td class="m">apache/kafka:4.1.0</td><td>Single node, KRaft mode (no ZooKeeper). Started from <code>kafka/docker-compose.yml</code>. Topic auto-creation is off.</td></tr>
+      <tr><td>Kafka UI</td><td class="m">http://localhost:8090</td><td class="m">kafbat/kafka-ui:v1.2.0</td><td>Browse topics and read every event message.</td></tr>
+      <tr><td>PostgreSQL</td><td class="m">localhost:5432</td><td>Local installation (pgAdmin)</td><td>Create the five empty databases once. JPA creates the tables.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="doc" id="events">
+  <h2><span class="chap">03</span>Topics and events</h2>
+  <p class="lede prose">There is one topic per publishing service. A service writes only to its own topic and reads from the topics of the services it cares about.</p>
+
+  <div class="adm note"><div class="h">Note</div><p>Topics are created by the applications, not by Docker. At startup each service lists the existing topics, creates only the missing ones, and checks the partition count before its listeners start. If Kafka is not running, the service stops with a clear message.</p></div>
+
+  <h3 id="message">Event message: envelope and body</h3>
+  <p class="prose">Every event has two parts. The <strong>envelope</strong> is the same for all event types and describes the event itself: what happened, who sent it, when, and which transfer it belongs to. The <strong>body</strong> is a nested JSON object whose fields depend on the event type. Each type has its own body with only the fields its consumers need.</p>
+  <div class="code"><div class="code-head"><span>Example: value of a message on gl-events</span><button class="copy" type="button">Copy</button></div><pre>{
+  "eventId": "6f1c2a9e-4b7d-4f43-9d0a-3c2b1e7f8a10",
+  "eventType": "GL_POSTING_REVERSED",
+  "eventVersion": 1,
+  "source": "gl-service",
+  "correlationId": "TXN-20261028103015-A1B2C3",
+  "causationId": "c41e7b20-9a4d-4d6b-8f0e-2b7a5c9d1e33",
+  "occurredAt": "2026-10-28T04:30:15.412Z",
+  "body": {
+    "transactionRef": "TXN-20261028103015-A1B2C3",
+    "flowType": "SEQUENTIAL",
+    "originalJournalId": "1b2c3d4e-5f60-4a71-8b92-a3b4c5d6e7f8",
+    "reversalJournalId": "9e8f7a6b-5c4d-4e3f-a2b1-c0d9e8f7a6b5",
+    "amount": 700000,
+    "currency": "BDT",
+    "reason": "FinBook entry limit exceeded: 700000 &gt; 500000"
+  }
+}</pre></div>
+
+  <h4>Envelope fields (class <code>EventMessage</code>)</h4>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td class="m">eventId</td><td>Unique id of this event</td><td class="m">6f1c2a9e-…</td></tr>
+      <tr><td class="m">eventType</td><td>What happened. Tells the consumer which body class to read. Kept as text, so an unknown type never breaks a consumer</td><td class="m">GL_POSTING_REVERSED</td></tr>
+      <tr><td class="m">eventVersion</td><td>Version of the body format for this type. Goes up only for a breaking change</td><td class="m">1</td></tr>
+      <tr><td class="m">source</td><td>Service that published the event</td><td class="m">gl-service</td></tr>
+      <tr><td class="m">correlationId</td><td>Links every event of one transfer. Same value as <code>transactionRef</code> and the Kafka key</td><td class="m">TXN-…-A1B2C3</td></tr>
+      <tr><td class="m">causationId</td><td><code>eventId</code> of the event that caused this one. Empty for the first event. Lets you rebuild the chain</td><td class="m">c41e7b20-…</td></tr>
+      <tr><td class="m">occurredAt</td><td>When the event was created (UTC)</td><td class="m">2026-10-28T04:30:15.412Z</td></tr>
+      <tr><td class="m">body</td><td>Event-specific data, a JSON object (never a JSON string)</td><td class="m">{ … }</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Kafka record around the message</h4>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>Value</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Key</td><td class="m">transactionRef</td><td>All events of one transfer go to the same partition, in order</td></tr>
+      <tr><td>Header <code>eventType</code></td><td class="m">GL_POSTING_REVERSED</td><td>Tools and consumers can filter without reading the JSON</td></tr>
+      <tr><td>Header <code>eventVersion</code></td><td class="m">1</td><td>Same as the envelope field</td></tr>
+      <tr><td>Header <code>source</code></td><td class="m">gl-service</td><td>Same as the envelope field</td></tr>
+      <tr><td>Value</td><td>The JSON envelope above</td><td>The message itself</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4 id="bodies">Body of each event type (class <code>EventBodies</code>)</h4>
+  <p class="prose">Every body has <code>transactionRef</code> and <code>flowType</code>. The other fields are listed below.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>eventType</th><th>Body record</th><th>Other body fields</th></tr></thead>
+    <tbody>
+      <tr><td class="m">TRANSACTION_INITIATED</td><td class="m">TransactionInitiated</td><td class="m">debitAccount, creditAccount, amount, currency</td></tr>
+      <tr><td class="m">FUNDS_RESERVED</td><td class="m">FundsReserved</td><td class="m">reservationId, debitAccount, creditAccount, amount, currency</td></tr>
+      <tr><td class="m">FUNDS_RELEASED</td><td class="m">FundsReleased</td><td class="m">reservationId, amount, currency, reason</td></tr>
+      <tr><td class="m">GL_POSTING_COMPLETED</td><td class="m">GlPostingCompleted</td><td class="m">journalId, debitAccount, creditAccount, amount, currency</td></tr>
+      <tr><td class="m">GL_POSTING_FAILED</td><td class="m">GlPostingFailed</td><td class="m">amount, currency, reason</td></tr>
+      <tr><td class="m">GL_POSTING_REVERSED</td><td class="m">GlPostingReversed</td><td class="m">originalJournalId, reversalJournalId, amount, currency, reason</td></tr>
+      <tr><td class="m">GL_POSTING_CANCELLED</td><td class="m">GlPostingCancelled</td><td class="m">reason</td></tr>
+      <tr><td class="m">COMPLIANCE_APPROVED</td><td class="m">ComplianceApproved</td><td class="m">checkId, amount, currency</td></tr>
+      <tr><td class="m">COMPLIANCE_REJECTED</td><td class="m">ComplianceRejected</td><td class="m">checkId, ruleCode, amount, currency, reason</td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_CREATED</td><td class="m">FinBookEntryCreated</td><td class="m">entryId, amount, currency</td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_FAILED</td><td class="m">FinBookEntryFailed</td><td class="m">amount, currency, reason</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>How a consumer reads a message</h4>
+  <ol class="prose">
+    <li>Kafka delivers the record. Spring turns the value into an <code>EventMessage</code>.</li>
+    <li>The listener reads <code>eventType</code> and switches on it. Types it does not care about are ignored. Unknown types become <code>UNKNOWN</code> and are logged, not failed.</li>
+    <li>For a type it cares about, it converts <code>body</code> into that type's record with <code>EventBodyReader</code>.</li>
+    <li>It checks <code>flowType</code> when the service takes part in only one scenario, then calls the service method.</li>
+  </ol>
+  <div class="code"><div class="code-head"><span>GlEventListener.java (excerpt)</span><button class="copy" type="button">Copy</button></div><pre>switch (EventType.of(msg.getEventType())) {
+    case COMPLIANCE_REJECTED -&gt; {
+        var b = reader.read(msg, EventBodies.ComplianceRejected.class);
+        if (b.flowType() == FlowType.PARALLEL) {
+            glService.reverseJournal(b.transactionRef(), b.flowType(), type, b.reason(), b.amount(), b.currency());
+        }
+    }
+    default -&gt; { /* not relevant for GL */ }
+}</pre></div>
+  <div class="code"><div class="code-head"><span>Publishing (any service)</span><button class="copy" type="button">Copy</button></div><pre>publisher.publish(KafkaTopics.GL_EVENTS, EventType.GL_POSTING_REVERSED,
+        new EventBodies.GlPostingReversed(ref, flowType, originalId, reversalId, amount, currency, reason));
+// SagaEventPublisher fills the envelope (eventId, source, correlationId, causationId, occurredAt),
+// adds the Kafka headers, and sends after the database commit.</pre></div>
+  <div class="adm imp"><div class="h">Rules for changing an event</div><p>Never remove or rename a body field. Only add new fields; consumers ignore fields they do not know. A breaking change needs a new <code>eventVersion</code>. A body is always a JSON object, never a JSON string inside JSON.</p></div>
+  <div class="adm note"><div class="h">Note</div><p><code>eventType</code>, <code>flowType</code> and the envelope are this project's own design, not Kafka features. Kafka sees only the topic, the key, the headers and the value. The <code>EventMessage</code>, <code>EventBodies</code> and <code>EventType</code> classes are copied into each service, and the JSON shape is the contract between them.</p></div>
+
+  <h3 id="catalog">Event catalog</h3>
+  <p class="prose">Who publishes and who consumes each event. The body of each type is listed in the table above.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Event</th><th>Type</th><th>Published by</th><th>Topic</th><th>Consumed by</th><th>Scenario</th></tr></thead>
+    <tbody>
+      <tr><td class="m">TRANSACTION_INITIATED</td><td><span class="k k-fwd">Start</span></td><td>Transaction Engine</td><td class="m">transaction-events</td><td>GL (S1), Account (S2)</td><td>1, 2</td></tr>
+      <tr><td class="m">FUNDS_RESERVED</td><td><span class="k k-fwd">Forward</span></td><td>Account</td><td class="m">account-events</td><td>GL, Compliance</td><td>2</td></tr>
+      <tr><td class="m">GL_POSTING_COMPLETED</td><td><span class="k k-fwd">Forward</span></td><td>GL</td><td class="m">gl-events</td><td>FinBook</td><td>1, 2</td></tr>
+      <tr><td class="m">COMPLIANCE_APPROVED</td><td><span class="k k-fwd">Forward</span></td><td>Compliance</td><td class="m">compliance-events</td><td>FinBook</td><td>2</td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_CREATED</td><td><span class="k k-ok">Success end</span></td><td>FinBook</td><td class="m">finbook-events</td><td>Transaction Engine, Account (S2)</td><td>1, 2</td></tr>
+      <tr><td class="m">GL_POSTING_FAILED</td><td><span class="k k-fail">Failure</span></td><td>GL</td><td class="m">gl-events</td><td>Transaction Engine, Account (S2), FinBook (S2)</td><td>1, 2</td></tr>
+      <tr><td class="m">COMPLIANCE_REJECTED</td><td><span class="k k-fail">Failure</span></td><td>Compliance</td><td class="m">compliance-events</td><td>Transaction Engine, GL, Account, FinBook</td><td>2</td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_FAILED</td><td><span class="k k-fail">Failure</span></td><td>FinBook</td><td class="m">finbook-events</td><td>Transaction Engine, GL, Account (S2)</td><td>1, 2</td></tr>
+      <tr><td class="m">GL_POSTING_REVERSED</td><td><span class="k k-comp">Compensation</span></td><td>GL</td><td class="m">gl-events</td><td>Transaction Engine</td><td>1, 2</td></tr>
+      <tr><td class="m">GL_POSTING_CANCELLED</td><td><span class="k k-comp">Compensation</span></td><td>GL</td><td class="m">gl-events</td><td>Transaction Engine</td><td>2</td></tr>
+      <tr><td class="m">FUNDS_RELEASED</td><td><span class="k k-comp">Compensation</span></td><td>Account</td><td class="m">account-events</td><td>Transaction Engine</td><td>2</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="doc" id="api">
+  <h2><span class="chap">04</span>The transfer API</h2>
+  <p class="lede prose">Both scenarios use the same endpoint. The <code>flowType</code> picks the scenario, and the <code>amount</code> decides whether the transfer passes or fails.</p>
+  <div class="ep"><span class="verb">POST</span><span class="path">http://localhost:8081/api/transactions</span><span class="ret">returns <code>202 Accepted</code> with status <code>PENDING</code></span></div>
+  <div class="code"><div class="code-head"><span>Request body: CreateTransactionRequest</span><button class="copy" type="button">Copy</button></div><pre>{
+  "flowType": "SEQUENTIAL",
+  "debitAccount": "ACC-1001",
+  "creditAccount": "ACC-2001",
+  "amount": 1000,
+  "currency": "BDT"
+}</pre></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Field</th><th>Required</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td class="m">flowType</td><td>No</td><td><code>SEQUENTIAL</code> (default) or <code>PARALLEL</code></td></tr>
+      <tr><td class="m">debitAccount</td><td>Yes</td><td>Not blank, up to 50 characters</td></tr>
+      <tr><td class="m">creditAccount</td><td>Yes</td><td>Not blank, up to 50 characters</td></tr>
+      <tr><td class="m">amount</td><td>Yes</td><td>At least 0.01</td></tr>
+      <tr><td class="m">currency</td><td>Yes</td><td>3 letters, for example <code>BDT</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Business rules that make a step fail</h3>
+  <p class="prose">The demo uses simple amount limits so you can switch between pass and fail by changing one value in the request. Each limit is set in that service's <code>application.yml</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Service</th><th>Property</th><th>Limit</th><th>When the amount is above the limit</th></tr></thead>
+    <tbody>
+      <tr><td>FinBook</td><td class="m">saga.rules.finbook.max-entry-amount</td><td class="m num">500,000</td><td>Entry fails, <code>FINBOOK_ENTRY_FAILED</code></td></tr>
+      <tr><td>Compliance</td><td class="m">saga.rules.compliance.max-transaction-amount</td><td class="m num">500,000</td><td>Check rejects, <code>COMPLIANCE_REJECTED</code></td></tr>
+      <tr><td>GL</td><td class="m">saga.rules.gl.max-posting-amount</td><td class="m num">1,000,000</td><td>Posting fails, <code>GL_POSTING_FAILED</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Amount</th><th>Scenario 1 (SEQUENTIAL)</th><th>Scenario 2 (PARALLEL)</th></tr></thead>
+    <tbody>
+      <tr><td class="m num">1,000</td><td><span class="k k-ok">COMPLETED</span></td><td><span class="k k-ok">COMPLETED</span></td></tr>
+      <tr><td class="m num">700,000</td><td><span class="k k-fail">FAILED</span> FinBook fails, GL reversed</td><td><span class="k k-fail">FAILED</span> Compliance rejects, GL reversed, funds released</td></tr>
+      <tr><td class="m num">1,500,000</td><td><span class="k k-fail">FAILED</span> GL fails, nothing to undo</td><td><span class="k k-fail">FAILED</span> GL fails and Compliance rejects, funds released</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="doc" id="s1">
+  <h2><span class="chap">05</span>Scenario 1: Sequential</h2>
+  <p class="lede prose">One service after another. Transaction Engine starts the Saga, GL posts the journal, FinBook records the entry.</p>
+  <div class="chain" aria-label="Scenario 1 chain"><span class="n">Transaction Engine</span><span class="a">→</span><span class="n">GL Service</span><span class="a">→</span><span class="n">FinBook Service</span></div>
+  <p class="prose">Request: <code>"flowType": "SEQUENTIAL"</code>. Account and Compliance ignore these events.</p>
+  <div class="cases" data-flows="s1-pass,s1-fail-finbook,s1-fail-gl"></div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="doc" id="s2">
+  <h2><span class="chap">06</span>Scenario 2: Parallel</h2>
+  <p class="lede prose">Account reserves the funds first. GL and Compliance then work at the same time on the same event. FinBook runs only when both have succeeded.</p>
+  <div class="chain" aria-label="Scenario 2 chain"><span class="n">Transaction Engine</span><span class="a">→</span><span class="n">Account Service</span><span class="a">→</span><span class="par"><span class="lbl">in parallel</span><span class="n">GL Service</span><span class="n">Compliance Service</span></span><span class="a">→</span><span class="n">FinBook Service</span></div>
+  <p class="prose">Request: <code>"flowType": "PARALLEL"</code>. The parallel step needs no extra code: <code>FUNDS_RESERVED</code> is one message, and GL and Compliance each read it in their own consumer group. FinBook keeps a small <code>finbook_join</code> row per transaction to remember which of the two results has arrived.</p>
+  <div class="cases" data-flows="s2-pass,s2-fail-compliance,s2-fail-gl"></div>
+  <div class="adm imp"><div class="h">Important</div><p>In the Compliance-reject case, the rejection can reach GL before GL has posted. GL then writes a <code>CANCELLED</code> marker instead of posting, publishes <code>GL_POSTING_CANCELLED</code>, and ignores the late <code>FUNDS_RESERVED</code>. You may see either <code>REVERSED</code> or <code>CANCELLED</code> in <code>gl_journal</code>. Both are correct.</p></div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="doc" id="rollback">
+  <h2><span class="chap">07</span>Rollback reference</h2>
+  <p class="lede prose">Which failure event triggers which compensating event, and who listens for it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Failure event</th><th>Scenario</th><th>Already done before the failure</th><th>Compensating action</th><th>Compensation event</th><th>Transaction Engine waits for</th></tr></thead>
+    <tbody>
+      <tr><td class="m">GL_POSTING_FAILED</td><td>1</td><td>Nothing</td><td>None</td><td>–</td><td>Nothing. Goes straight to <code>FAILED</code></td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_FAILED</td><td>1</td><td>GL journal posted</td><td>GL posts a reversal journal built from its own stored journal lines, debit and credit swapped</td><td class="m">GL_POSTING_REVERSED</td><td><code>GL_POSTING_REVERSED</code></td></tr>
+      <tr><td class="m">COMPLIANCE_REJECTED</td><td>2</td><td>Funds reserved, GL may have posted</td><td>Account releases funds. GL reverses, or cancels if it has not posted yet. FinBook marks the join rejected</td><td class="m">FUNDS_RELEASED<br>GL_POSTING_REVERSED or GL_POSTING_CANCELLED</td><td>Both GL and Account</td></tr>
+      <tr><td class="m">GL_POSTING_FAILED</td><td>2</td><td>Funds reserved</td><td>Account releases funds. FinBook marks the join rejected</td><td class="m">FUNDS_RELEASED</td><td><code>FUNDS_RELEASED</code></td></tr>
+      <tr><td class="m">FINBOOK_ENTRY_FAILED</td><td>2</td><td>Funds reserved, GL posted, Compliance approved</td><td>GL reverses. Account releases funds</td><td class="m">GL_POSTING_REVERSED<br>FUNDS_RELEASED</td><td>Both GL and Account</td></tr>
+    </tbody>
+  </table></div>
+  <div class="adm note"><div class="h">Note</div><p>FinBook cannot fail in Scenario 2 with the default limits, because Compliance rejects every amount that FinBook would reject. The last row is handled in code for completeness.</p></div>
+  <h3>How Transaction Engine decides the final status</h3>
+  <ol class="prose">
+    <li>The first failure event moves the transaction from <code>PENDING</code> to <code>COMPENSATING</code> and stores the reason.</li>
+    <li>Each compensation event sets a flag: <code>gl_settled</code> (GL reversed, cancelled or never posted) or <code>funds_released</code>.</li>
+    <li>When every required flag is set, the status becomes <code>FAILED</code>. Scenario 1 needs <code>gl_settled</code>. Scenario 2 needs both.</li>
+  </ol>
+  <p class="prose">Events can arrive in any order. The flags make the result the same whatever the order.</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="doc" id="status">
+  <h2><span class="chap">08</span>Status values</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Table (database)</th><th>Column</th><th>Values</th></tr></thead>
+    <tbody>
+      <tr><td class="m">bank_transaction (txn_db)</td><td class="m">status</td><td><span class="k k-fwd">PENDING</span> Saga running · <span class="k k-ok">COMPLETED</span> all steps done · <span class="k k-comp">COMPENSATING</span> undoing earlier steps · <span class="k k-fail">FAILED</span> failed and fully compensated</td></tr>
+      <tr><td class="m">account_reservation (account_db)</td><td class="m">status</td><td><span class="k k-fwd">RESERVED</span> money on hold · <span class="k k-ok">CONFIRMED</span> Saga completed · <span class="k k-comp">RELEASED</span> hold removed</td></tr>
+      <tr><td class="m">gl_journal (gl_db)</td><td class="m">journal_type</td><td><span class="k k-fwd">POSTING</span> the normal journal · <span class="k k-comp">REVERSAL</span> the mirror journal, linked by <code>reversal_of</code></td></tr>
+      <tr><td class="m">gl_journal (gl_db)</td><td class="m">posting_status</td><td><span class="k k-ok">POSTED</span> booked · <span class="k k-fail">FAILED</span> rule failed · <span class="k k-comp">REVERSED</span> undone · <span class="k k-comp">CANCELLED</span> blocked before posting</td></tr>
+      <tr><td class="m">compliance_check (compliance_db)</td><td class="m">decision</td><td><span class="k k-ok">APPROVED</span> · <span class="k k-fail">REJECTED</span></td></tr>
+      <tr><td class="m">finbook_entry (finbook_db)</td><td class="m">status</td><td><span class="k k-ok">CREATED</span> · <span class="k k-fail">FAILED</span></td></tr>
+      <tr><td class="m">finbook_join (finbook_db)</td><td class="m">gl_done, compliance_done, rejected</td><td>Scenario 2 only. The entry is created when <code>gl_done</code> and <code>compliance_done</code> are both true and <code>rejected</code> is false.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="doc" id="run">
+  <h2><span class="chap">09</span>Run and verify</h2>
+  <h3>Prerequisites</h3>
+  <ul class="prose">
+    <li>JDK 21 and Maven 3.9 or later</li>
+    <li>Docker Desktop (for Kafka)</li>
+    <li>PostgreSQL on <code>localhost:5432</code>, with pgAdmin or <code>psql</code></li>
+  </ul>
+  <h3>Procedure</h3>
+  <h4>1. Create the five databases</h4>
+  <p class="prose">No seed data is needed. Tables are created on first start and every row comes from your requests.</p>
+  <div class="code"><div class="code-head"><span>pgAdmin Query Tool, connected to the postgres database</span><button class="copy" type="button">Copy</button></div><pre>CREATE DATABASE txn_db;
+CREATE DATABASE account_db;
+CREATE DATABASE gl_db;
+CREATE DATABASE compliance_db;
+CREATE DATABASE finbook_db;</pre></div>
+  <p class="prose">Then set your PostgreSQL username and password in each service's <code>src/main/resources/application.yml</code>.</p>
+  <h4>2. Start Kafka</h4>
+  <div class="code"><div class="code-head"><span>CMD</span><button class="copy" type="button">Copy</button></div><pre>cd D:\Choreography_SAGA\kafka
+docker compose up -d</pre></div>
+  <h4>3. Start the five services</h4>
+  <p class="prose">Open one terminal per service. Any start order works, because each service creates the topics it needs.</p>
+  <div class="code"><div class="code-head"><span>Run in each service folder</span><button class="copy" type="button">Copy</button></div><pre>cd D:\Choreography_SAGA\transaction-engine-service && mvn spring-boot:run
+cd D:\Choreography_SAGA\account-service            && mvn spring-boot:run
+cd D:\Choreography_SAGA\gl-service                 && mvn spring-boot:run
+cd D:\Choreography_SAGA\compliance-service         && mvn spring-boot:run
+cd D:\Choreography_SAGA\finbook-service            && mvn spring-boot:run</pre></div>
+  <p class="prose">Each console should show lines like <code>[KAFKA] Topic 'gl-events' READY (partitions=3, replicas=1)</code>.</p>
+  <h4>4. Send the six test requests</h4>
+  <p class="prose">These commands work in CMD and Git Bash. In PowerShell, type <code>curl.exe</code> instead of <code>curl</code>.</p>
+  <div class="code"><div class="code-head"><span>Scenario 1: Sequential</span><button class="copy" type="button">Copy</button></div><pre>:: 1A pass  → COMPLETED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"SEQUENTIAL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":1000,\"currency\":\"BDT\"}"
+
+:: 1B FinBook fails → GL reversed → FAILED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"SEQUENTIAL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":700000,\"currency\":\"BDT\"}"
+
+:: 1C GL fails → FAILED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"SEQUENTIAL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":1500000,\"currency\":\"BDT\"}"</pre></div>
+  <div class="code"><div class="code-head"><span>Scenario 2: Parallel</span><button class="copy" type="button">Copy</button></div><pre>:: 2A pass → COMPLETED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"PARALLEL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":1000,\"currency\":\"BDT\"}"
+
+:: 2B Compliance rejects → GL reversed + funds released → FAILED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"PARALLEL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":700000,\"currency\":\"BDT\"}"
+
+:: 2C GL fails + Compliance rejects → funds released → FAILED
+curl -X POST http://localhost:8081/api/transactions -H "Content-Type: application/json" -d "{\"flowType\":\"PARALLEL\",\"debitAccount\":\"ACC-1001\",\"creditAccount\":\"ACC-2001\",\"amount\":1500000,\"currency\":\"BDT\"}"</pre></div>
+  <h4>5. Check the result in every service</h4>
+  <p class="prose">Copy the <code>transactionRef</code> from the POST response. A <code>404</code> means that service never acted on the transaction, which is expected in several failure cases.</p>
+  <div class="code"><div class="code-head"><span>CMD (in Git Bash use REF=... and $REF)</span><button class="copy" type="button">Copy</button></div><pre>set REF=TXN-20261028103015-A1B2C3
+
+curl http://localhost:8081/api/transactions/%REF%
+curl http://localhost:8082/api/accounts/reservations/%REF%
+curl http://localhost:8083/api/gl/postings/%REF%
+curl http://localhost:8084/api/compliance/checks/%REF%
+curl http://localhost:8085/api/finbook/entries/%REF%</pre></div>
+  <h3>Three ways to watch the Saga</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Where</th><th>What you see</th></tr></thead>
+    <tbody>
+      <tr><td>Service consoles</td><td><code>[KAFKA] &gt;&gt;&gt; PUBLISHED</code> in one service, then <code>[KAFKA] &lt;&lt;&lt; RECEIVED</code> in the next, followed by business lines such as <code>[GL] … REVERSED (compensation)</code> and <code>[SAGA] … FAILED - all compensations finished</code>.</td></tr>
+      <tr><td>Kafka UI, <code>localhost:8090</code></td><td>Topics → pick a topic → Messages. The key is the <code>transactionRef</code>. All events of one transfer share the same partition.</td></tr>
+      <tr><td>pgAdmin</td><td>Query each database, for example <code>SELECT transaction_ref, status, status_reason FROM bank_transaction ORDER BY created_at DESC;</code> in <code>txn_db</code>.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="doc" id="trouble">
+  <h2><span class="chap">10</span>Troubleshooting</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Service stops with "Kafka is not reachable at localhost:9092"</td><td>Kafka container is not running</td><td>Run <code>docker compose up -d</code> in the <code>kafka</code> folder, then <code>docker ps</code> to confirm <code>saga-kafka</code> is up.</td></tr>
+      <tr><td>Service stops with "database … does not exist"</td><td>Database not created</td><td>Run the five <code>CREATE DATABASE</code> statements in step 1.</td></tr>
+      <tr><td>Service stops with "password authentication failed"</td><td>Wrong PostgreSQL login</td><td>Fix <code>spring.datasource.username</code> and <code>password</code> in that service's <code>application.yml</code>.</td></tr>
+      <tr><td>Transaction stays <code>PENDING</code></td><td>A service in the chain is not running</td><td>Start it. It reads the waiting events from Kafka and the Saga continues from where it stopped.</td></tr>
+      <tr><td>Log shows <code>Cannot read body of …</code> or <code>Event … has no body</code> right after upgrading</td><td>Topics still hold messages in the old 1.0 format (no envelope)</td><td>Run <code>docker compose down</code> then <code>docker compose up -d</code> in the <code>kafka</code> folder. The broker has no volume, so this starts with empty topics. These messages are skipped, not retried.</td></tr>
+      <tr><td>Log warns that a topic has a different partition count</td><td>Topic was created earlier with other settings</td><td>Keep all five topics at the same count (3). Delete the topic in Kafka UI and restart the service, or run <code>docker compose down</code> for a clean broker.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="adm warn"><div class="h">Known limitation</div><p>This POC has no Outbox. If the database commit succeeds but Kafka is down at that moment, the event is lost and the transaction stays <code>PENDING</code>. An Outbox table is the planned fix for a production version.</p></div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="doc" id="history">
+  <h2><span class="chap">11</span>Revision history</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
+    <tbody>
+      <tr><td class="m">1.1</td><td>28 Oct 2026</td><td>Events use a standard envelope (<code>EventMessage</code>) with a typed <code>body</code> per event type (<code>EventBodies</code>). Kafka headers <code>eventType</code>, <code>eventVersion</code>, <code>source</code>. <code>causationId</code> links each event to the one that caused it. Unknown event types are ignored, unreadable bodies are not retried. GL reversal is built from GL's own stored journal lines. Compliance rejection carries a <code>ruleCode</code>. The flow viewers in sections 5 and 6 now show the exact Kafka message of every step.</td></tr>
+      <tr><td class="m">1.0</td><td>28 Oct 2026</td><td>First release: both scenarios, flat <code>SagaEvent</code> message, animated flow and sequence views.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</main>
+</div>
+
+<footer class="legal"><div class="wrap gutter">
+  <p><strong>Choreography Saga POC 1.0</strong> · Leads Corporation Limited · Internal documentation</p>
+  <p>Source projects: <code>D:\Choreography_SAGA</code> (transaction-engine-service, account-service, gl-service, compliance-service, finbook-service, kafka). Limits and ports in this guide match the default <code>application.yml</code> of each service.</p>
+</div></footer>
+
+<script>
+(function(){
+/* ---------- lanes ---------- */
+var LANES = {
+  C:  {name:'Client', sub:'curl / Postman', client:true},
+  TE: {name:'Transaction Engine', sub:':8081 · txn_db'},
+  ACC:{name:'Account Service', sub:':8082 · account_db'},
+  GL: {name:'GL Service', sub:':8083 · gl_db'},
+  CMP:{name:'Compliance Service', sub:':8084 · compliance_db'},
+  FB: {name:'FinBook Service', sub:':8085 · finbook_db'}
+};
+function req(flow, amt){ return {t:'http', from:'C', to:'TE', ev:'POST /api/transactions', topic:'flowType='+flow+' · amount='+amt,
+  say:'The client sends the transfer request with flowType '+flow+' and amount '+amt+'.'}; }
+var START = [
+  {t:'db', at:'TE', text:'bank_transaction = PENDING', kind:'neutral', say:'Transaction Engine saves the transaction in txn_db with status PENDING and a new transactionRef.'},
+  {t:'reply', from:'TE', to:'C', ev:'202 Accepted', topic:'status = PENDING', say:'The client gets 202 Accepted right away. The rest of the Saga runs in the background, so poll GET /api/transactions/{ref} for the final status.'}
+];
+function evt(from, to, ev, topic, kind, say){ return {t:'evt', from:from, to:to, ev:ev, topic:topic, kind:kind, say:say}; }
+function db(at, text, kind, say){ return {t:'db', at:at, text:text, kind:kind, say:say}; }
+
+/* ---------- flows ---------- */
+var FLOWS = {
+ 's1-pass': {tab:'Pass · amount 1,000', ok:true, lanes:['C','TE','GL','FB'], final:'COMPLETED',
+  intro:'Every step succeeds. Three events travel from left to right and the last one tells Transaction Engine the transfer is done.',
+  steps:[req('SEQUENTIAL','1000')].concat(START,[
+   evt('TE',['GL'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED. GL reacts because flowType is SEQUENTIAL.'),
+   db('GL','gl_journal POSTING = POSTED','ok','GL books the journal in gl_db: Dr ACC-1001 1,000 / Cr ACC-2001 1,000.'),
+   evt('GL',['FB'],'GL_POSTING_COMPLETED','gl-events','fwd','GL publishes GL_POSTING_COMPLETED. FinBook is listening on gl-events.'),
+   db('FB','finbook_entry = CREATED','ok','FinBook saves the entry in finbook_db.'),
+   evt('FB',['TE'],'FINBOOK_ENTRY_CREATED','finbook-events','fwd','FinBook publishes FINBOOK_ENTRY_CREATED, the last event of the Saga.'),
+   db('TE','bank_transaction = COMPLETED','ok','Transaction Engine marks the transaction COMPLETED.')
+  ])},
+ 's1-fail-finbook': {tab:'Fail · FinBook (700,000)', ok:false, lanes:['C','TE','GL','FB'], final:'FAILED',
+  intro:'GL succeeds, then FinBook fails because 700,000 is above its 500,000 limit. GL must undo its posting with a reversal journal.',
+  steps:[req('SEQUENTIAL','700000')].concat(START,[
+   evt('TE',['GL'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED.'),
+   db('GL','gl_journal POSTING = POSTED','ok','GL posts the journal. 700,000 is within the GL limit of 1,000,000.'),
+   evt('GL',['FB'],'GL_POSTING_COMPLETED','gl-events','fwd','GL publishes GL_POSTING_COMPLETED.'),
+   db('FB','finbook_entry = FAILED (limit 500,000)','fail','FinBook rejects the entry because 700,000 is above its limit, and saves it as FAILED.'),
+   {t:'begin', region:'comp', label:'ROLLBACK (COMPENSATION)'},
+   evt('FB',['TE','GL'],'FINBOOK_ENTRY_FAILED','finbook-events','fail','FinBook publishes FINBOOK_ENTRY_FAILED. Two services read it: Transaction Engine and GL.'),
+   db('TE','bank_transaction = COMPENSATING','comp','Transaction Engine moves to COMPENSATING and waits for GL to finish undoing its work.'),
+   db('GL','POSTING → REVERSED + new REVERSAL journal','comp','GL does not delete anything. It marks the original journal REVERSED and books a new REVERSAL journal from its own stored lines, with debit and credit swapped: Dr ACC-2001 / Cr ACC-1001.'),
+   evt('GL',['TE'],'GL_POSTING_REVERSED','gl-events','comp','GL publishes GL_POSTING_REVERSED to report that its compensation is done.'),
+   db('TE','bank_transaction = FAILED','fail','All required compensations are done, so Transaction Engine marks the transaction FAILED.'),
+   {t:'end'}
+  ])},
+ 's1-fail-gl': {tab:'Fail · GL (1,500,000)', ok:false, lanes:['C','TE','GL','FB'], final:'FAILED',
+  intro:'GL fails at the first step because 1,500,000 is above its 1,000,000 limit. Nothing succeeded before it, so there is nothing to roll back.',
+  steps:[req('SEQUENTIAL','1500000')].concat(START,[
+   evt('TE',['GL'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED.'),
+   db('GL','gl_journal POSTING = FAILED (limit 1,000,000)','fail','GL refuses to post and saves the journal as FAILED with no entries.'),
+   {t:'begin', region:'comp', label:'FAILURE (NOTHING TO COMPENSATE)'},
+   evt('GL',['TE'],'GL_POSTING_FAILED','gl-events','fail','GL publishes GL_POSTING_FAILED. FinBook ignores it in Scenario 1.'),
+   db('TE','bank_transaction = FAILED','fail','No earlier step needs undoing, so Transaction Engine marks the transaction FAILED immediately.'),
+   db('FB','never called','skip','FinBook never received GL_POSTING_COMPLETED, so it did nothing. GET on FinBook returns 404.'),
+   {t:'end'}
+  ])},
+ 's2-pass': {tab:'Pass · amount 1,000', ok:true, lanes:['C','TE','ACC','GL','CMP','FB'], final:'COMPLETED',
+  intro:'Funds are reserved, then GL and Compliance work at the same time. FinBook waits for both results before it creates the entry.',
+  steps:[req('PARALLEL','1000')].concat(START,[
+   evt('TE',['ACC'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED. Account reacts because flowType is PARALLEL. GL ignores it.'),
+   db('ACC','account_reservation = RESERVED','neutral','Account puts 1,000 on hold for ACC-1001.'),
+   {t:'begin', region:'par', label:'PARALLEL: ONE EVENT, TWO CONSUMERS'},
+   evt('ACC',['GL','CMP'],'FUNDS_RESERVED','account-events','fwd','Account publishes one FUNDS_RESERVED message. GL and Compliance each read it in their own consumer group, so they run at the same time.'),
+   db('GL','gl_journal POSTING = POSTED','ok','GL posts the journal.'),
+   db('CMP','compliance_check = APPROVED','ok','Compliance approves, because 1,000 is within the 500,000 limit.'),
+   evt('GL',['FB'],'GL_POSTING_COMPLETED','gl-events','fwd','GL tells FinBook it is done.'),
+   evt('CMP',['FB'],'COMPLIANCE_APPROVED','compliance-events','fwd','Compliance tells FinBook it approved.'),
+   {t:'end'},
+   db('FB','join: GL ✓ + Compliance ✓ → entry CREATED','ok','FinBook\u2019s join row now has both results, so it creates the entry. The order of the two events does not matter.'),
+   evt('FB',['TE','ACC'],'FINBOOK_ENTRY_CREATED','finbook-events','fwd','FinBook publishes FINBOOK_ENTRY_CREATED. Transaction Engine and Account both read it.'),
+   db('TE','bank_transaction = COMPLETED','ok','Transaction Engine marks the transaction COMPLETED.'),
+   db('ACC','account_reservation = CONFIRMED','ok','Account confirms the hold. The money movement is now final.')
+  ])},
+ 's2-fail-compliance': {tab:'Fail · Compliance (700,000)', ok:false, lanes:['C','TE','ACC','GL','CMP','FB'], final:'FAILED',
+  intro:'GL posts, but Compliance rejects because 700,000 is above its 500,000 limit. One rejection event triggers rollback in three services.',
+  steps:[req('PARALLEL','700000')].concat(START,[
+   evt('TE',['ACC'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED.'),
+   db('ACC','account_reservation = RESERVED','neutral','Account puts 700,000 on hold.'),
+   {t:'begin', region:'par', label:'PARALLEL'},
+   evt('ACC',['GL','CMP'],'FUNDS_RESERVED','account-events','fwd','One FUNDS_RESERVED message goes to GL and Compliance at the same time.'),
+   db('GL','gl_journal POSTING = POSTED','ok','GL posts the journal. 700,000 is within the GL limit.'),
+   db('CMP','compliance_check = REJECTED (limit 500,000)','fail','Compliance rejects the transfer.'),
+   evt('GL',['FB'],'GL_POSTING_COMPLETED','gl-events','fwd','GL tells FinBook it is done.'),
+   db('FB','join: GL ✓, waiting for Compliance','neutral','FinBook records GL as done and waits. It will not create the entry yet.'),
+   {t:'end'},
+   {t:'begin', region:'comp', label:'ROLLBACK (COMPENSATION)'},
+   evt('CMP',['TE','GL','ACC','FB'],'COMPLIANCE_REJECTED','compliance-events','fail','Compliance publishes COMPLIANCE_REJECTED. Four services read the same message.'),
+   db('TE','bank_transaction = COMPENSATING','comp','Transaction Engine moves to COMPENSATING and waits for GL and Account.'),
+   db('GL','POSTING → REVERSED + new REVERSAL journal','comp','GL reverses its posting with a new REVERSAL journal.'),
+   db('ACC','account_reservation = RELEASED','comp','Account removes the hold on the funds.'),
+   db('FB','join = REJECTED, entry never created','comp','FinBook marks the join rejected, so a late GL event can never create the entry.'),
+   evt('GL',['TE'],'GL_POSTING_REVERSED','gl-events','comp','GL reports its compensation is done.'),
+   evt('ACC',['TE'],'FUNDS_RELEASED','account-events','comp','Account reports its compensation is done.'),
+   db('TE','bank_transaction = FAILED','fail','GL settled and funds released, so Transaction Engine marks the transaction FAILED.'),
+   {t:'end'}
+  ])},
+ 's2-fail-gl': {tab:'Fail · GL + Compliance (1,500,000)', ok:false, lanes:['C','TE','ACC','GL','CMP','FB'], final:'FAILED',
+  intro:'Both parallel steps fail. GL has nothing to undo, so only the reservation is released. Account handles the two failure events but releases only once.',
+  steps:[req('PARALLEL','1500000')].concat(START,[
+   evt('TE',['ACC'],'TRANSACTION_INITIATED','transaction-events','fwd','Transaction Engine publishes TRANSACTION_INITIATED.'),
+   db('ACC','account_reservation = RESERVED','neutral','Account puts 1,500,000 on hold.'),
+   {t:'begin', region:'par', label:'PARALLEL'},
+   evt('ACC',['GL','CMP'],'FUNDS_RESERVED','account-events','fwd','One FUNDS_RESERVED message goes to GL and Compliance.'),
+   db('GL','gl_journal POSTING = FAILED (limit 1,000,000)','fail','GL refuses to post.'),
+   db('CMP','compliance_check = REJECTED (limit 500,000)','fail','Compliance rejects the transfer.'),
+   {t:'end'},
+   {t:'begin', region:'comp', label:'ROLLBACK (COMPENSATION)'},
+   evt('GL',['TE','ACC','FB'],'GL_POSTING_FAILED','gl-events','fail','GL publishes GL_POSTING_FAILED to Transaction Engine, Account and FinBook.'),
+   db('TE','bank_transaction = COMPENSATING','comp','Transaction Engine moves to COMPENSATING. GL failed, so GL is already settled. It now waits only for Account.'),
+   db('ACC','account_reservation = RELEASED','comp','Account releases the hold.'),
+   db('FB','join = REJECTED','comp','FinBook marks the join rejected.'),
+   evt('CMP',['GL','ACC'],'COMPLIANCE_REJECTED','compliance-events','fail','Compliance publishes COMPLIANCE_REJECTED as well (Transaction Engine and FinBook also read it).'),
+   db('GL','already FAILED, nothing to reverse','skip','GL sees its journal already FAILED, so there is nothing to reverse.'),
+   db('ACC','already RELEASED, ignored','skip','Account sees the reservation already RELEASED and ignores the second failure. This is what idempotent means.'),
+   evt('ACC',['TE'],'FUNDS_RELEASED','account-events','comp','Account reports its compensation is done.'),
+   db('TE','bank_transaction = FAILED','fail','All compensations are done, so Transaction Engine marks the transaction FAILED.'),
+   {t:'end'}
+  ])}
+};
+
+/* ---------- measuring ---------- */
+var cv = document.createElement('canvas').getContext('2d');
+function textW(s, font){ cv.font = font; return cv.measureText(s).width; }
+var NS = 'http://www.w3.org/2000/svg';
+function el(name, attrs, parent){ var e = document.createElementNS(NS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function txt(parent, x, y, s, cls, anchor){ var t = el('text', {x:x, y:y, 'class':cls, 'text-anchor':anchor||'middle'}, parent); t.textContent = s; return t; }
+
+/* ---------- renderer ---------- */
+function render(flow, uid){
+  var LW = flow.lanes.length > 4 ? 158 : 210, LM = 52, HEAD = 70;
+  var width = LM + flow.lanes.length * LW + 12;
+  var idx = {}; flow.lanes.forEach(function(k,i){ idx[k]=i; });
+  function X(k){ return LM + idx[k]*LW + LW/2; }
+
+  // layout
+  var y = HEAD + 24, rows = [], regions = [], stack = [], n = 0;
+  flow.steps.forEach(function(s){
+    if (s.t === 'begin'){ stack.push({kind:s.region, label:s.label, y1:y}); y += 30; return; }
+    if (s.t === 'end'){ var r = stack.pop(); r.y2 = y + 6; regions.push(r); y += 18; return; }
+    n++;
+    var item = {s:s, n:n, y:y, parts:[]};
+    if (s.t === 'db'){ item.parts.push({y:y + 21}); y += 44; }
+    else {
+      var targets = Array.isArray(s.to) ? s.to : [s.to];
+      targets.forEach(function(to){ item.parts.push({to:to, y:y + 30}); y += 52; });
+    }
+    item.h = y - item.y;
+    rows.push(item);
+  });
+  var height = y + 16;
+
+  var svg = el('svg', {viewBox:'0 0 '+width+' '+height, width:width, height:height, role:'img', 'aria-label':'Sequence diagram'});
+  var defs = el('defs', {}, svg);
+  ['fwd','http','fail','comp'].forEach(function(k){
+    var m = el('marker', {id:uid+'-'+k, viewBox:'0 0 10 10', refX:'9', refY:'5', markerWidth:'7', markerHeight:'7', orient:'auto-start-reverse'}, defs);
+    el('path', {d:'M0,0 L10,5 L0,10 z', 'class':'mk-'+k}, m);
+  });
+
+  // regions (behind)
+  regions.forEach(function(r){
+    var x1 = LM - 8, w = width - x1 - 6;
+    el('rect', {x:x1, y:r.y1, width:w, height:r.y2 - r.y1, rx:4, 'class':'d-reg '+r.kind}, svg);
+    txt(svg, x1 + 10, r.y1 + 19, r.label, 'd-reg-lbl '+r.kind, 'start');
+  });
+  // lifelines + heads
+  flow.lanes.forEach(function(k){
+    var L = LANES[k], x = X(k), w = LW - 14;
+    el('line', {x1:x, y1:HEAD, x2:x, y2:height - 8, 'class':'d-life'}, svg);
+    var g = el('g', {'class':'d-head' + (L.client ? ' client' : '')}, svg);
+    el('rect', {x:x - w/2, y:12, width:w, height:HEAD - 18, rx:4}, g);
+    txt(g, x, 35, L.name, 'd-t1');
+    txt(g, x, 53, L.sub, 'd-t2');
+  });
+
+  // steps
+  var groups = [];
+  rows.forEach(function(item){
+    var s = item.s;
+    var g = el('g', {'class':'st', 'data-i':item.n - 1}, svg);
+    el('rect', {x:0, y:item.y, width:width, height:item.h, 'class':'d-hl'}, g);
+    var b = el('g', {'class':'d-badge'}, g);
+    el('circle', {cx:24, cy:item.parts[0].y, r:11}, b);
+    txt(b, 24, item.parts[0].y + 4, String(item.n), '');
+
+    if (s.t === 'db'){
+      var font = '500 12.5px "Red Hat Text", "Segoe UI", sans-serif';
+      var w = Math.ceil(textW(s.text, font)) + 22, cx = X(s.at);
+      var x = Math.max(LM - 4, Math.min(cx - w/2, width - w - 8));
+      var cg = el('g', {'class':'d-chip ' + s.kind}, g);
+      el('rect', {x:x, y:item.parts[0].y - 13, width:w, height:26, rx:13}, cg);
+      txt(cg, x + w/2, item.parts[0].y + 4.5, s.text, '');
+    } else {
+      var kind = s.t === 'evt' ? s.kind : (s.t === 'http' ? 'http' : 'reply');
+      var mk = s.t === 'evt' ? s.kind : 'http';
+      item.parts.forEach(function(p){
+        var x1 = X(s.from), x2 = X(p.to), dir = x2 > x1 ? 1 : -1;
+        el('line', {x1:x1 + dir*4, y1:p.y, x2:x2 - dir*3, y2:p.y, 'class':'d-line ' + kind, 'marker-end':'url(#'+uid+'-'+mk+')'}, g);
+        var mid = (x1 + x2) / 2;
+        txt(g, mid, p.y - 8, s.ev, 'd-ev ' + (s.t === 'evt' ? s.kind : 'http'));
+        txt(g, mid, p.y + 16, s.t === 'evt' ? 'topic: ' + s.topic : s.topic, 'd-topic');
+      });
+    }
+    groups.push(g);
+  });
+  return {svg:svg, groups:groups, rows:rows};
+}
+
+
+/* ---------- animated topology view ---------- */
+var TOPO = {
+  s1:{w:900, h:290, pos:{C:[90,175], TE:[300,175], GL:[560,175], FB:[820,175]}, over:{'FB>TE':24}, bend:{}},
+  s2:{w:940, h:500, pos:{C:[72,240], TE:[255,240], ACC:[447,240], GL:[655,125], CMP:[655,355], FB:[852,240]}, over:{'FB>TE':-12}, bend:{'GL>TE':30,'CMP>TE':-44}}
+};
+var BW = 156, BH = 62, CW = 120;
+var CHIP = {
+  'gl_journal POSTING = POSTED':['gl_journal','POSTED'],
+  'POSTING → REVERSED + new REVERSAL journal':['gl_journal','REVERSED + REVERSAL'],
+  'gl_journal POSTING = FAILED (limit 1,000,000)':['gl_journal','FAILED'],
+  'already FAILED, nothing to reverse':['gl_journal','FAILED · nothing to reverse'],
+  'join: GL ✓ + Compliance ✓ → entry CREATED':['finbook_entry','CREATED'],
+  'join: GL ✓, waiting for Compliance':['finbook_join','GL ✓ · waiting'],
+  'join = REJECTED, entry never created':['finbook_join','REJECTED · no entry'],
+  'join = REJECTED':['finbook_join','REJECTED · no entry'],
+  'already RELEASED, ignored':['account_reservation','RELEASED · duplicate ignored'],
+  'never called':['','not called'],
+  'finbook_entry = FAILED (limit 500,000)':['finbook_entry','FAILED'],
+  'compliance_check = REJECTED (limit 500,000)':['compliance_check','REJECTED']
+};
+function chipOf(s){
+  if (CHIP[s.text]) return CHIP[s.text];
+  var i = s.text.indexOf('=');
+  return i > 0 ? [s.text.slice(0, i).trim(), s.text.slice(i + 1).trim()] : ['', s.text];
+}
+var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderTopo(flow, key, uid){
+  var T = TOPO[key.slice(0, 2)], svg = el('svg', {viewBox:'0 0 '+T.w+' '+T.h, width:T.w, height:T.h, role:'img', 'aria-label':'Animated service flow'});
+  var defs = el('defs', {}, svg);
+  ['track','fwd','cur','http','fail','comp'].forEach(function(k){
+    var m = el('marker', {id:uid+'-t'+k, viewBox:'0 0 10 10', refX:'8.5', refY:'5', markerWidth:'6.5', markerHeight:'6.5', orient:'auto-start-reverse'}, defs);
+    el('path', {d:'M0,0 L10,5 L0,10 z', 'class':'tm-'+k}, m);
+  });
+  function P(k){ return T.pos[k]; }
+  function bw(k){ return LANES[k].client ? CW : BW; }
+  function edgePt(k, tx, ty, gap){
+    var c = P(k), dx = tx - c[0], dy = ty - c[1];
+    if (!dx && !dy) return c;
+    var t = Math.min((bw(k)/2 + gap) / Math.abs(dx || 1e-9), (BH/2 + gap) / Math.abs(dy || 1e-9));
+    return [c[0] + dx*t, c[1] + dy*t];
+  }
+  // collect edges
+  var edges = {}, order = [];
+  flow.steps.forEach(function(s){
+    if (s.t !== 'evt' && s.t !== 'http' && s.t !== 'reply') return;
+    (Array.isArray(s.to) ? s.to : [s.to]).forEach(function(to){
+      var k = s.from + '>' + to; if (!edges[k]){ edges[k] = {from:s.from, to:to}; order.push(k); }
+    });
+  });
+  var gE = el('g', {}, svg), gB = el('g', {}, svg), gL = el('g', {}, svg);
+  order.forEach(function(k){
+    var e = edges[k], a = P(e.from), b = P(e.to), d;
+    if (T.over[k] !== undefined){
+      var top = T.over[k];
+      var p1 = [a[0], a[1] - BH/2 - 3], p2 = [b[0], b[1] - BH/2 - 5];
+      d = 'M'+p1[0]+' '+p1[1]+' C'+a[0]+' '+top+' '+b[0]+' '+top+' '+p2[0]+' '+p2[1];
+    } else {
+      var bend = T.bend[k] !== undefined ? T.bend[k] : (edges[e.to + '>' + e.from] ? 14 : 0);
+      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+      var cx = mx + (-dy / L) * bend, cy = my + (dx / L) * bend;
+      // positive bend: right-to-left arcs go up, left-to-right arcs go down
+      var q1 = edgePt(e.from, cx, cy, 3), q2 = edgePt(e.to, cx, cy, 6);
+      d = 'M'+q1[0].toFixed(1)+' '+q1[1].toFixed(1)+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+q2[0].toFixed(1)+' '+q2[1].toFixed(1);
+    }
+    e.path = el('path', {d:d, 'class':'t-edge', 'marker-end':'url(#'+uid+'-ttrack)'}, gE);
+  });
+  // boxes + chips
+  var boxes = {}, obstacles = [];
+  flow.lanes.forEach(function(k){
+    var L = LANES[k], c = P(k), w = bw(k);
+    var g = el('g', {'class':'t-box' + (L.client ? ' client' : '')}, gB);
+    el('rect', {'class':'ring', x:c[0]-w/2-4, y:c[1]-BH/2-4, width:w+8, height:BH+8, rx:6}, g);
+    el('rect', {'class':'b', x:c[0]-w/2, y:c[1]-BH/2, width:w, height:BH, rx:4}, g);
+    txt(g, c[0], c[1] - 4, L.name, 'n');
+    txt(g, c[0], c[1] + 15, L.sub, 'p');
+    var chip = el('g', {'class':'t-chip idle'}, gB);
+    boxes[k] = {g:g, chip:chip};
+    obstacles.push([c[0]-w/2-4, c[1]-BH/2-4, w+8, BH+8]);
+    if (!L.client) obstacles.push([c[0]-95, c[1]+BH/2+6, 190, 40]);
+  });
+  function setChip(k, val, kind){
+    var b = boxes[k], c = P(k); if (LANES[k].client) return;
+    b.chip.innerHTML = ''; b.chip.setAttribute('class', 't-chip ' + kind);
+    var tb = val[0], v = val[1];
+    var w = Math.max(textW(v, '600 12px "Red Hat Text", sans-serif'), textW(tb, '10px "Red Hat Mono", monospace')) + 22;
+    var y0 = c[1] + BH/2 + 8, h = tb ? 36 : 24;
+    el('rect', {x:c[0]-w/2, y:y0, width:w, height:h, rx:4}, b.chip);
+    if (tb){ txt(b.chip, c[0], y0 + 13, tb, 'tb'); txt(b.chip, c[0], y0 + 29, v, 'v'); }
+    else txt(b.chip, c[0], y0 + 16, v, 'v');
+  }
+  function hits(r){ return obstacles.some(function(o){ return r[0] < o[0]+o[2] && r[0]+r[2] > o[0] && r[1] < o[1]+o[3] && r[1]+r[3] > o[1]; }); }
+  function label(x, y, ev, tp, kind, free){
+    var w = Math.max(textW(ev, '600 12px "Red Hat Mono", monospace'), textW(tp, '10.5px "Red Hat Mono", monospace')) + 20, h = 38;
+    var lx = Math.max(4, Math.min(x - w/2, T.w - w - 4)), ly = y - h/2;
+    if (!free){
+      var tries = 0, base = ly;
+      while (hits([lx, ly, w, h]) && tries < 24){ tries++; ly = base - tries*8; }
+      if (hits([lx, ly, w, h])){ tries = 0; ly = base; while (hits([lx, ly, w, h]) && tries < 24){ tries++; ly = base + tries*8; } }
+    }
+    ly = Math.max(4, Math.min(ly, T.h - h - 4));
+    var g = el('g', {'class':'t-label ' + kind}, gL);
+    el('rect', {x:lx, y:ly, width:w, height:h, rx:4}, g);
+    txt(g, lx + w/2, ly + 16, ev, 'ev');
+    txt(g, lx + w/2, ly + 31, tp, 'tp');
+  }
+  var raf = [];
+  function packet(path, kind, onEnd){
+    var len = path.getTotalLength(), c = el('circle', {r:6.5, 'class':'t-pk ' + kind}, gL), t0 = null;
+    function f(ts){
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 950), e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2, p = path.getPointAtLength(len * e);
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+      if (k < 1) raf.push(requestAnimationFrame(f)); else { c.remove(); onEnd && onEnd(); }
+    }
+    raf.push(requestAnimationFrame(f));
+  }
+  var steps = flow.steps.filter(function(s){ return s.t !== 'begin' && s.t !== 'end'; });
+  function kindOf(s){ return s.t === 'evt' ? s.kind : 'http'; }
+
+  function update(i, animate){
+    raf.forEach(cancelAnimationFrame); raf = [];
+    gL.innerHTML = '';
+    var upto = i < 0 ? steps.length - 1 : i;
+    // chips
+    flow.lanes.forEach(function(k){ if (!LANES[k].client) setChip(k, ['', i < 0 ? 'idle' : 'waiting'], 'idle'); });
+    var edgeKind = {};
+    for (var j = 0; j <= upto; j++){
+      var s = steps[j];
+      if (s.t === 'db') setChip(s.at, chipOf(s), s.kind);
+      else (Array.isArray(s.to) ? s.to : [s.to]).forEach(function(to){ edgeKind[s.from + '>' + to] = kindOf(s); });
+    }
+    var cur = i >= 0 ? steps[i] : null, curEdges = {};
+    if (cur && cur.t !== 'db') (Array.isArray(cur.to) ? cur.to : [cur.to]).forEach(function(to){ curEdges[cur.from + '>' + to] = 1; });
+    order.forEach(function(k){
+      var e = edges[k], kd = edgeKind[k], isCur = !!curEdges[k];
+      e.path.setAttribute('class', 't-edge' + (kd ? ' used ' + kd : '') + (isCur ? ' cur' : ''));
+      var mk = !kd ? 'track' : (isCur && kd === 'fwd' ? 'cur' : kd);
+      e.path.setAttribute('marker-end', 'url(#'+uid+'-t'+mk+')');
+    });
+    flow.lanes.forEach(function(k){ boxes[k].g.classList.remove('active', 'hit', 'k-fwd', 'k-http', 'k-fail', 'k-comp'); });
+    if (!cur) return;
+    if (cur.t === 'db'){ boxes[cur.at].g.classList.add('active'); return; }
+    boxes[cur.from].g.classList.add('active');
+    var targets = Array.isArray(cur.to) ? cur.to : [cur.to], kind = kindOf(cur);
+    if (targets.length === 1){
+      var path = edges[cur.from + '>' + targets[0]].path, mid = path.getPointAtLength(path.getTotalLength() / 2);
+      label(mid.x, mid.y, cur.ev, cur.t === 'evt' ? 'topic: ' + cur.topic : cur.topic, kind);
+    } else {
+      var c = P(cur.from), isTop = flow.lanes.every(function(k){ return P(k)[1] >= c[1]; }) && c[1] < P('TE')[1];
+      var ly = isTop ? c[1] - BH/2 - 30 : c[1] + BH/2 + 84;
+      label(c[0], ly, cur.ev, 'topic: ' + cur.topic + ' → ' + targets.length + ' consumers', kind, true);
+    }
+    targets.forEach(function(to){
+      var path = edges[cur.from + '>' + to].path;
+      var done = function(){ boxes[to].g.classList.remove('hit'); void boxes[to].g.getBBox(); boxes[to].g.classList.add('hit', 'k-' + kind); };
+      if (animate && !RM) packet(path, kind, done); else done();
+    });
+  }
+  return {svg:svg, update:update};
+}
+
+
+/* ---------- per-step Kafka message (envelope + body), mirrors the Java classes ---------- */
+var SOURCE = {TE:'transaction-engine-service', ACC:'account-service', GL:'gl-service', CMP:'compliance-service', FB:'finbook-service'};
+var TOPIC_OF = {TE:'transaction-events', ACC:'account-events', GL:'gl-events', CMP:'compliance-events', FB:'finbook-events'};
+var FAIL_REASON = {
+  GL_POSTING_FAILED: function(a){ return 'GL posting limit exceeded: ' + a + ' > 1000000'; },
+  FINBOOK_ENTRY_FAILED: function(a){ return 'FinBook entry limit exceeded: ' + a + ' > 500000'; },
+  COMPLIANCE_REJECTED: function(a){ return 'Single-transaction limit exceeded: ' + a + ' > 500000'; }
+};
+function fakeUuid(seed){
+  var h = 2166136261, out = '';
+  for (var r = 0; r < 4; r++){
+    for (var i = 0; i < seed.length; i++){ h ^= seed.charCodeAt(i) + r * 31; h = Math.imul(h, 16777619) >>> 0; }
+    out += ('00000000' + h.toString(16)).slice(-8);
+  }
+  return out.slice(0,8) + '-' + out.slice(8,12) + '-4' + out.slice(13,16) + '-a' + out.slice(17,20) + '-' + out.slice(20,32);
+}
+function buildMessages(key, flow){
+  var steps = flow.steps.filter(function(s){ return s.t !== 'begin' && s.t !== 'end'; });
+  var flowType = steps[0].topic.indexOf('PARALLEL') >= 0 ? 'PARALLEL' : 'SEQUENTIAL';
+  var amount = Number(/amount=(\d+)/.exec(steps[0].topic)[1]);
+  var ref = 'TXN-20261028103015-' + fakeUuid(key).slice(0, 6).toUpperCase();
+  var ids = {journal: fakeUuid(key + 'j'), reversal: fakeUuid(key + 'r'), reservation: fakeUuid(key + 'res'), check: fakeUuid(key + 'c'), entry: fakeUuid(key + 'e')};
+  var t0 = Date.UTC(2026, 9, 28, 4, 30, 15, 120);
+  var lastIn = {}, firstFail = {};
+  var out = [];
+  steps.forEach(function(s, i){
+    var at = new Date(t0 + i * 37).toISOString();
+    if (s.t === 'http'){
+      out.push({kind:'http', title:'HTTP request', meta:[['POST', '/api/transactions'], ['Content-Type', 'application/json']],
+        json:{flowType:flowType, debitAccount:'ACC-1001', creditAccount:'ACC-2001', amount:amount, currency:'BDT'}});
+      return;
+    }
+    if (s.t === 'reply'){
+      out.push({kind:'http', title:'HTTP response', meta:[['Status', '202 Accepted']],
+        json:{transactionRef:ref, flowType:flowType, debitAccount:'ACC-1001', creditAccount:'ACC-2001', amount:amount, currency:'BDT', status:'PENDING', statusReason:null}});
+      return;
+    }
+    if (s.t === 'db'){ out.push(null); return; }
+    var ev = s.ev, base = {transactionRef:ref, flowType:flowType}, body;
+    var cause = firstFail[s.from];
+    var reason = FAIL_REASON[ev] ? FAIL_REASON[ev](amount) : (cause ? cause.reason : null);
+    switch (ev){
+      case 'TRANSACTION_INITIATED': body = {debitAccount:'ACC-1001', creditAccount:'ACC-2001', amount:amount, currency:'BDT'}; break;
+      case 'FUNDS_RESERVED': body = {reservationId:ids.reservation, debitAccount:'ACC-1001', creditAccount:'ACC-2001', amount:amount, currency:'BDT'}; break;
+      case 'FUNDS_RELEASED': body = {reservationId:ids.reservation, amount:amount, currency:'BDT', reason:reason}; break;
+      case 'GL_POSTING_COMPLETED': body = {journalId:ids.journal, debitAccount:'ACC-1001', creditAccount:'ACC-2001', amount:amount, currency:'BDT'}; break;
+      case 'GL_POSTING_FAILED': body = {amount:amount, currency:'BDT', reason:reason}; break;
+      case 'GL_POSTING_REVERSED': body = {originalJournalId:ids.journal, reversalJournalId:ids.reversal, amount:amount, currency:'BDT', reason:reason}; break;
+      case 'GL_POSTING_CANCELLED': body = {reason:reason}; break;
+      case 'COMPLIANCE_APPROVED': body = {checkId:ids.check, amount:amount, currency:'BDT'}; break;
+      case 'COMPLIANCE_REJECTED': body = {checkId:ids.check, ruleCode:'SINGLE_TXN_LIMIT', amount:amount, currency:'BDT', reason:reason}; break;
+      case 'FINBOOK_ENTRY_CREATED': body = {entryId:ids.entry, amount:amount, currency:'BDT'}; break;
+      case 'FINBOOK_ENTRY_FAILED': body = {amount:amount, currency:'BDT', reason:reason}; break;
+    }
+    for (var k in body) base[k] = body[k];
+    var eventId = fakeUuid(key + ':' + i);
+    var causation = s.kind === 'comp' && cause ? cause.id : (lastIn[s.from] || null);
+    var env = {eventId:eventId, eventType:ev, eventVersion:1, source:SOURCE[s.from], correlationId:ref, causationId:causation, occurredAt:at, body:base};
+    out.push({kind:'kafka', topic:TOPIC_OF[s.from], key:ref, ev:ev, source:SOURCE[s.from], json:env,
+      to:(Array.isArray(s.to) ? s.to : [s.to])});
+    (Array.isArray(s.to) ? s.to : [s.to]).forEach(function(t){
+      lastIn[t] = eventId;
+      if (s.kind === 'fail' && !firstFail[t]) firstFail[t] = {id:eventId, reason:reason};
+    });
+  });
+  return out;
+}
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function prettyJson(obj){
+  var j = JSON.stringify(obj, null, 2), out = '', last = 0, m;
+  var re = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?)|\b(null|true|false)\b/g;
+  while ((m = re.exec(j))){
+    out += esc(j.slice(last, m.index));
+    if (m[1]){
+      var cls = m[2] ? 'jk' : (/^"(TRANSACTION_INITIATED|FUNDS_[A-Z_]+|GL_[A-Z_]+|COMPLIANCE_[A-Z_]+|FINBOOK_[A-Z_]+)"$/.test(m[1]) ? 'jt' : 'js');
+      out += '<span class="' + cls + '">' + esc(m[1]) + '</span>' + (m[2] ? esc(m[2]) : '');
+    } else if (m[3]) out += '<span class="jn">' + m[3] + '</span>';
+    else out += '<span class="jb">' + m[4] + '</span>';
+    last = re.lastIndex;
+  }
+  return out + esc(j.slice(last));
+}
+
+/* ---------- viewer ---------- */
+var uidc = 0;
+function laneName(k){ return LANES[k].name; }
+function buildViewer(panel, key){
+  var flow = FLOWS[key], uid = 'f' + (++uidc);
+  var r = render(flow, uid), total = r.rows.length, cur = -1, timer = null;
+
+  var intro = document.createElement('div'); intro.className = 'case-intro';
+  intro.innerHTML = '<p></p><div class="result">Final status<span class="s ' + (flow.ok ? 'ok' : 'fail') + '">' + flow.final + '</span></div>';
+  intro.querySelector('p').textContent = flow.intro;
+  panel.appendChild(intro);
+
+  var ctrls = document.createElement('div'); ctrls.className = 'ctrls';
+  ctrls.innerHTML =
+    '<span class="views" role="group" aria-label="View"><button type="button" data-v="topo" aria-pressed="true">Animated flow</button><button type="button" data-v="seq" aria-pressed="false">Sequence diagram</button></span>' +
+    '<button type="button" class="btn pri" data-a="play">▶ Play</button>' +
+    '<button type="button" class="btn" data-a="prev" aria-label="Previous step">◀ Prev</button>' +
+    '<button type="button" class="btn" data-a="next" aria-label="Next step">Next ▶</button>' +
+    '<button type="button" class="btn" data-a="all">Show all</button>' +
+    '<span class="counter" aria-live="polite"></span>' +
+    '<span class="legend"><span><i class="fwd"></i>Event</span><span><i class="fail"></i>Failure event</span><span><i class="comp"></i>Compensation event</span><span><b></b>DB change</span></span>';
+  panel.appendChild(ctrls);
+
+  var topo = renderTopo(flow, key, uid);
+  var tstage = document.createElement('div'); tstage.className = 'topo'; tstage.appendChild(topo.svg); panel.appendChild(tstage);
+  var tnote = document.createElement('p'); tnote.className = 'tnote';
+  tnote.textContent = 'Red solid frame = service publishing the event. Dashed frame = services receiving it. The box under each service shows its latest database status.';
+  tstage.appendChild(tnote);
+  var stage = document.createElement('div'); stage.className = 'stage'; stage.hidden = true; stage.appendChild(r.svg); panel.appendChild(stage);
+  var cap = document.createElement('div'); cap.className = 'caption'; panel.appendChild(cap);
+  var msgs = buildMessages(key, flow);
+  var mbox = document.createElement('div'); mbox.className = 'msg'; mbox.hidden = true; panel.appendChild(mbox);
+  function renderMsg(i){
+    if (i < 0){ mbox.hidden = true; cap.classList.remove('has-msg'); return; }
+    mbox.hidden = false; cap.classList.add('has-msg');
+    var m = msgs[i];
+    if (!m){ mbox.innerHTML = '<div class="none">No Kafka message in this step. The service only changes its own database.</div>'; return; }
+    var head;
+    if (m.kind === 'http'){
+      head = '<b>' + m.title + '</b>' + m.meta.map(function(x){ return '<span>' + esc(x[0]) + ' <code>' + esc(x[1]) + '</code></span>'; }).join('');
+    } else {
+      head = '<b>Kafka message</b><span>topic <code>' + m.topic + '</code></span><span>key <code>' + esc(m.key) + '</code></span>' +
+        '<span>headers <code>eventType=' + m.ev + '</code> <code>eventVersion=1</code> <code>source=' + m.source + '</code></span>';
+    }
+    mbox.innerHTML = '<div class="msg-head">' + head + '</div><pre>' + prettyJson(m.json) + '</pre>';
+  }
+
+  // step table
+  var tw = document.createElement('div'); tw.className = 'tbl steps';
+  var tb = '<table><thead><tr><th>#</th><th>Service</th><th>What happens</th><th>Topic / detail</th><th>Type</th></tr></thead><tbody>';
+  r.rows.forEach(function(it){
+    var s = it.s, who, what, det, type;
+    if (s.t === 'db'){ who = laneName(s.at); what = s.text; det = 'own database'; type = '<span class="k k-' + (s.kind === 'neutral' || s.kind === 'skip' ? 'fwd' : s.kind) + '">DB change</span>'; }
+    else {
+      var to = (Array.isArray(s.to) ? s.to : [s.to]).map(laneName).join(', ');
+      who = laneName(s.from) + ' → ' + to; what = s.ev; det = s.topic;
+      type = s.t === 'evt' ? '<span class="k k-' + (s.kind === 'fwd' ? 'fwd' : s.kind) + '">' + (s.kind === 'fail' ? 'Failure event' : s.kind === 'comp' ? 'Compensation event' : 'Event') + '</span>' : '<span class="k k-http">HTTP</span>';
+    }
+    tb += '<tr tabindex="0" data-i="' + (it.n - 1) + '"><td class="n">' + it.n + '</td><td>' + who + '</td><td class="m">' + what + '</td><td class="m">' + det + '</td><td>' + type + '</td></tr>';
+  });
+  tw.innerHTML = tb + '</tbody></table>';
+  panel.appendChild(tw);
+  var trs = tw.querySelectorAll('tbody tr');
+
+  var bPlay = ctrls.querySelector('[data-a=play]'), bPrev = ctrls.querySelector('[data-a=prev]'), bNext = ctrls.querySelector('[data-a=next]'), counter = ctrls.querySelector('.counter');
+
+  function show(i, animate){
+    cur = i;
+    topo.update(i, !!animate);
+    renderMsg(i);
+    var stepping = i >= 0;
+    r.svg.classList.toggle('stepping', stepping);
+    r.groups.forEach(function(g, j){
+      g.classList.toggle('cur', stepping && j === i);
+      g.classList.toggle('future', stepping && j > i);
+    });
+    trs.forEach(function(tr, j){ tr.classList.toggle('cur', stepping && j === i); });
+    if (stepping){
+      var it = r.rows[i], s = it.s;
+      var where = s.t === 'db' ? laneName(s.at) : laneName(s.from) + ' → ' + (Array.isArray(s.to) ? s.to : [s.to]).map(laneName).join(', ');
+      cap.innerHTML = '<span class="no">Step ' + (i + 1) + '</span><div class="txt"></div>';
+      var t = cap.querySelector('.txt'); t.textContent = s.say;
+      var sm = document.createElement('small'); sm.textContent = where; t.prepend(sm);
+      counter.textContent = (i + 1) + ' / ' + total;
+    } else {
+      cap.innerHTML = '<span class="no">All steps</span><div class="txt">Showing the complete flow with ' + total + ' steps. Press <strong>Play</strong> or <strong>Next</strong> to follow it one step at a time. Each event step also shows the exact Kafka message: topic, key, headers, envelope and body.</div>';
+      counter.textContent = total + ' steps';
+    }
+    bPrev.disabled = i <= 0;
+    bNext.disabled = i >= total - 1;
+  }
+  function stop(){ if (timer){ clearInterval(timer); timer = null; } bPlay.textContent = '▶ Play'; }
+  function play(){
+    if (timer){ stop(); return; }
+    if (cur < 0 || cur >= total - 1) cur = 0;
+    bPlay.textContent = '❚❚ Pause';
+    show(cur, true);
+    timer = setInterval(function(){ if (cur >= total - 1){ stop(); return; } show(cur + 1, true); }, 1900);
+  }
+  ctrls.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    var v = b.getAttribute('data-v');
+    if (v){
+      ctrls.querySelectorAll('[data-v]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      tstage.hidden = v !== 'topo'; stage.hidden = v !== 'seq'; return;
+    }
+    var a = b.getAttribute('data-a');
+    if (a === 'play') play();
+    else if (a === 'next'){ stop(); show(Math.min(total - 1, cur + 1), true); }
+    else if (a === 'prev'){ stop(); show(Math.max(0, cur - 1), true); }
+    else if (a === 'all'){ stop(); show(-1); }
+  });
+  tw.addEventListener('click', function(e){ var tr = e.target.closest('tr[data-i]'); if (tr){ stop(); show(+tr.getAttribute('data-i'), true); } });
+  tw.addEventListener('keydown', function(e){ if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[data-i]')){ e.preventDefault(); stop(); show(+e.target.getAttribute('data-i')); } });
+  r.groups.forEach(function(g, j){ g.style.cursor = 'pointer'; g.addEventListener('click', function(){ stop(); show(j); }); });
+  show(-1);
+  return {stop:stop};
+}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.cases').forEach(function(box, bi){
+  var keys = box.getAttribute('data-flows').split(',');
+  var tabs = document.createElement('div'); tabs.className = 'tabs'; tabs.setAttribute('role', 'tablist');
+  box.appendChild(tabs);
+  var viewers = [], panels = [], btns = [];
+  keys.forEach(function(k, i){
+    var f = FLOWS[k];
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tab'; b.setAttribute('role', 'tab');
+    b.id = 'tab-' + k; b.setAttribute('aria-controls', 'panel-' + k);
+    b.innerHTML = '<span class="dot ' + (f.ok ? 'ok' : 'fail') + '" aria-hidden="true"></span>';
+    b.appendChild(document.createTextNode(f.tab));
+    tabs.appendChild(b); btns.push(b);
+    var p = document.createElement('div'); p.className = 'panel'; p.id = 'panel-' + k; p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', b.id);
+    box.appendChild(p); panels.push(p);
+    viewers.push(buildViewer(p, k));
+  });
+  function sel(i){
+    btns.forEach(function(b, j){ b.setAttribute('aria-selected', j === i ? 'true' : 'false'); b.tabIndex = j === i ? 0 : -1; });
+    panels.forEach(function(p, j){ p.hidden = j !== i; });
+    viewers.forEach(function(v, j){ if (j !== i) v.stop(); });
+  }
+  tabs.addEventListener('click', function(e){ var b = e.target.closest('.tab'); if (b) sel(btns.indexOf(b)); });
+  tabs.addEventListener('keydown', function(e){
+    var i = btns.indexOf(document.activeElement); if (i < 0) return;
+    if (e.key === 'ArrowRight'){ sel((i + 1) % btns.length); btns[(i + 1) % btns.length].focus(); }
+    if (e.key === 'ArrowLeft'){ sel((i - 1 + btns.length) % btns.length); btns[(i - 1 + btns.length) % btns.length].focus(); }
+  });
+  sel(0);
+});
+
+/* ---------- copy buttons ---------- */
+document.querySelectorAll('.code').forEach(function(c){
+  var b = c.querySelector('.copy'), pre = c.querySelector('pre'); if (!b || !pre) return;
+  b.addEventListener('click', function(){
+    var done = function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy'; }, 1400); };
+    var fallback = function(){ var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Press Ctrl+C'; setTimeout(function(){ b.textContent = 'Copy'; }, 2000); };
+    try { navigator.clipboard.writeText(pre.textContent).then(done, fallback); } catch(e){ fallback(); }
+  });
+});
+
+/* ---------- contents highlight ---------- */
+var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+if ('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(){
+    var best = 0;
+    targets.forEach(function(t, i){ if (t && t.getBoundingClientRect().top < 140) best = i; });
+    links.forEach(function(a, i){ a.classList.toggle('on', i === best); });
+  }, {rootMargin:'0px 0px -60% 0px', threshold:[0, 1]});
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+if (window.matchMedia('(max-width: 1000px)').matches){ var toc = document.getElementById('toc'); if (toc) toc.open = false; }
+})();
+</script>
+
+</body>
+</html>

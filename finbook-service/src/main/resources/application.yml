@@ -1,0 +1,60 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: finbook-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finbook_db
+    username: postgres        # change to your local PostgreSQL user
+    password: 12345        # change to your local PostgreSQL password
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      acks: all                                   # wait for all in-sync replicas
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true                  # no duplicate writes on producer retry
+        spring.json.add.type.headers: false       # plain JSON, no Java class names on the wire
+
+    consumer:
+      group-id: finbook-service
+      auto-offset-reset: earliest
+      enable-auto-commit: false                   # offset committed by Spring after the listener succeeds
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: com.example.finbook.messaging.event.EventMessage
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: com.example.finbook.messaging.event
+        # Same transactionRef -> same partition number on every topic -> RangeAssignor gives those
+        # partitions to the same consumer thread, so events of one transaction are handled one by one.
+        partition.assignment.strategy: org.apache.kafka.clients.consumer.RangeAssignor
+
+    listener:
+      ack-mode: record
+      concurrency: 3
+
+saga:
+  kafka:
+    topic:
+      partitions: 3
+      replicas: 1
+  rules:
+    finbook:
+      max-entry-amount: 500000            # amount above this -> FinBook entry FAILS (Scenario 1)
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    com.example.finbook: INFO
